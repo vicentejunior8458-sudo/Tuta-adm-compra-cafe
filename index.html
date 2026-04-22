@@ -3,64 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADM - TUTA CAFÉ</title>
+    <title>ADM - Gestão Tuta Café</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f1ea; margin: 0; padding: 10px; }
-        header { background: #3e2723; color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; }
-        .config-precos { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        body { font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 10px; }
+        .no-print { margin-bottom: 20px; }
+        header { background: #3e2723; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
         .grid-precos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #5d4037; }
-        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button#btnSalvarPreco { width: 100%; margin-top: 10px; background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        .card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #efebe9; padding: 12px; font-size: 11px; text-align: left; border-bottom: 2px solid #d7ccc8; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
-        .senha { background: #fff3e0; color: #d84315; font-weight: bold; padding: 3px; border-radius: 4px; }
-        .btn-del { color: red; cursor: pointer; font-weight: bold; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-update { background: #2e7d32; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; }
+        th { background: #eee; padding: 10px; text-align: left; border-bottom: 2px solid #ccc; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        
+        .status-pago { color: white; background: green; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
+        .status-pendente { color: white; background: #d32f2f; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
+        
+        .btn-action { padding: 5px; cursor: pointer; border: 1px solid #ccc; border-radius: 3px; background: white; margin: 2px; font-size: 10px; }
+        .print-only { display: none; }
+
+        @media print {
+            .no-print { display: none; }
+            .print-only { display: block; }
+            body { background: white; padding: 0; }
+            .receipt { border: 2px solid #000; padding: 20px; margin-bottom: 20px; page-break-after: always; }
+        }
     </style>
 </head>
 <body>
 
-<header><strong>TUTA CAFÉ - PAINEL ADMINISTRATIVO</strong></header>
+<div class="no-print">
+    <header><h1>PAINEL DE CONTROLE TUTA CAFÉ</h1></header>
 
-<div class="config-precos">
-    <label style="font-size: 14px; margin-bottom: 10px;">📊 ATUALIZAR PREÇOS DA SACA (R$)</label>
-    <div class="grid-precos">
-        <div>
-            <label>Novo (até 200 def)</label>
-            <input type="number" id="p_novo200" step="0.01">
+    <div class="box">
+        <strong>CONTROLE DE COTAÇÃO DO DIA</strong>
+        <div class="grid-precos">
+            <div><label>Novo 200</label><input type="number" id="p_novo200"></div>
+            <div><label>Velho 200</label><input type="number" id="p_velho200"></div>
+            <div><label>Até 300</label><input type="number" id="p_300"></div>
         </div>
-        <div>
-            <label>Velho (até 200 def)</label>
-            <input type="number" id="p_velho200" step="0.01">
-        </div>
-        <div>
-            <label>Até 300 defeitos</label>
-            <input type="number" id="p_300" step="0.01">
-        </div>
+        <button class="btn-update" onclick="salvarPrecos()">PUBLICAR PREÇOS</button>
     </div>
-    <button id="btnSalvarPreco" onclick="salvarPrecos()">ATUALIZAR PREÇOS NO SISTEMA</button>
+
+    <div style="margin-bottom: 10px;">
+        <button onclick="window.print()" style="background:#555; color:white; padding:10px; border:none; border-radius:4px; cursor:pointer;">🖨️ IMPRIMIR RELATÓRIO GERAL</button>
+    </div>
+
+    <div class="box" style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Produtor</th>
+                    <th>Banco/Conta</th>
+                    <th>Carga</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaBody"></tbody>
+        </table>
+    </div>
 </div>
 
-<div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Produtor</th>
-                <th>Senha SEFAZ</th>
-                <th>Banco/Conta</th>
-                <th>Local/Qtd</th>
-                <th>Obs</th>
-                <th>Ação</th>
-            </tr>
-        </thead>
-        <tbody id="tabela"></tbody>
-    </table>
-</div>
+<div id="printArea" class="print-only"></div>
 
 <script>
     const firebaseConfig = {
@@ -70,17 +79,15 @@
         projectId: "sistemacafe-e4a42",
         storageBucket: "sistemacafe-e4a42.firebasestorage.app",
         messagingSenderId: "483940361596",
-        appId: "1:483940361596:web:4418541808c717276c70f9",
-        measurementId: "G-BZEK0SJ5WD"
+        appId: "1:483940361596:web:4418541808c717276c70f9"
     };
-
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Carregar preços atuais nos campos
-    database.ref('precos').on('value', (snap) => {
+    // Gestão de Preços
+    database.ref('precos').on('value', snap => {
         const p = snap.val();
-        if(p) {
+        if(p){
             document.getElementById('p_novo200').value = p.novo200;
             document.getElementById('p_velho200').value = p.velho200;
             document.getElementById('p_300').value = p.def300;
@@ -88,34 +95,71 @@
     });
 
     function salvarPrecos() {
-        const dados = {
+        database.ref('precos').set({
             novo200: document.getElementById('p_novo200').value,
             velho200: document.getElementById('p_velho200').value,
             def300: document.getElementById('p_300').value
-        };
-        database.ref('precos').set(dados).then(() => alert("Preços atualizados para todos os corretores!"));
+        }).then(() => alert("Cotação atualizada!"));
     }
 
-    database.ref('compras').on('value', (snap) => {
-        const corpo = document.getElementById('tabela');
-        corpo.innerHTML = "";
+    // Gestão de Compras
+    database.ref('compras').on('value', snap => {
+        const body = document.getElementById('tabelaBody');
+        const printArea = document.getElementById('printArea');
+        body.innerHTML = ""; printArea.innerHTML = "";
+        
         snap.forEach(item => {
             const v = item.val();
-            corpo.innerHTML = `
+            const id = item.key;
+            const statusClass = v.status === 'PAGO' ? 'status-pago' : 'status-pendente';
+
+            // Adiciona na Tabela
+            body.innerHTML = `
                 <tr>
                     <td>${v.dataHr}</td>
-                    <td><b>${v.nome}</b><br><small>${v.cpf}</small></td>
-                    <td><span class="senha">${v.sefaz}</span></td>
-                    <td>B:${v.banco}<br>Ag:${v.agencia} C:${v.conta}</td>
-                    <td>🏢 ${v.armazem}<br><b>${v.qtd} ${v.unidade}</b></td>
-                    <td><small>${v.observacao || '-'}</small></td>
-                    <td><span class="btn-del" onclick="apagar('${item.key}')">Apagar</span></td>
+                    <td><b>${v.nome}</b><br>${v.cpf}</td>
+                    <td>${v.banco}<br>Ag:${v.agencia} C:${v.conta}</td>
+                    <td>${v.qtd} ${v.unidade} - ${v.tipoCafe}</td>
+                    <td><span class="${statusClass}">${v.status}</span></td>
+                    <td>
+                        <button class="btn-action" onclick="toggleStatus('${id}', '${v.status}')">✅ Alternar Pago</button>
+                        <button class="btn-action" onclick="imprimirUnico('${id}')">🖨️ Recibo</button>
+                        <button class="btn-action" style="color:red" onclick="apagar('${id}')">🗑️</button>
+                    </td>
                 </tr>
-            ` + corpo.innerHTML;
+            ` + body.innerHTML;
+
+            // Prepara área de impressão individual (Recibos)
+            printArea.innerHTML += `
+                <div class="receipt" id="recibo-${id}">
+                    <h2 style="text-align:center">TUTA CAFÉ - COMPROVANTE DE COMPRA</h2>
+                    <hr>
+                    <p><strong>PRODUTOR:</strong> ${v.nome}</p>
+                    <p><strong>CPF/CNPJ:</strong> ${v.cpf} | <strong>SEFAZ:</strong> ${v.sefaz}</p>
+                    <p><strong>BANCO:</strong> ${v.banco} | <strong>AG:</strong> ${v.agencia} | <strong>CC:</strong> ${v.conta}</p>
+                    <hr>
+                    <p><strong>PRODUTO:</strong> ${v.tipoCafe}</p>
+                    <p><strong>QUANTIDADE:</strong> ${v.qtd} ${v.unidade}</p>
+                    <p><strong>LOCAL:</strong> ${v.armazem}</p>
+                    <p><strong>DATA:</strong> ${v.dataHr}</p>
+                    <p><strong>STATUS:</strong> ${v.status}</p>
+                    <br><br>
+                    <div style="text-align:center; border-top:1px solid #000; width:300px; margin:auto">Assinatura Responsável</div>
+                </div>
+            `;
         });
     });
 
-    function apagar(id) { if(confirm("Apagar registro?")) database.ref('compras/'+id).remove(); }
+    function toggleStatus(id, atual) {
+        const novo = atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE';
+        database.ref('compras/'+id).update({status: novo});
+    }
+
+    function apagar(id) { if(confirm("Deseja excluir?")) database.ref('compras/'+id).remove(); }
+
+    function imprimirUnico(id) {
+        window.print(); // O CSS de impressão já cuida de mostrar a área de recibos
+    }
 </script>
 </body>
 </html>
