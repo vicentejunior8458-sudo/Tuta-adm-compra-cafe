@@ -9,19 +9,41 @@
     <style>
         body { font-family: sans-serif; background: #f4f1ea; margin: 0; padding: 10px; }
         header { background: #3e2723; color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; }
+        .config-precos { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .grid-precos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #5d4037; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button#btnSalvarPreco { width: 100%; margin-top: 10px; background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; }
         .card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: #efebe9; padding: 12px; font-size: 12px; text-align: left; border-bottom: 2px solid #d7ccc8; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top; }
-        .senha { background: #fff3e0; color: #d84315; font-weight: bold; padding: 4px 8px; border-radius: 4px; font-family: monospace; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #efebe9; padding: 12px; font-size: 11px; text-align: left; border-bottom: 2px solid #d7ccc8; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .senha { background: #fff3e0; color: #d84315; font-weight: bold; padding: 3px; border-radius: 4px; }
         .btn-del { color: red; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<header>
-    <strong>TUTA CAFÉ - PAINEL ADM</strong>
-</header>
+<header><strong>TUTA CAFÉ - PAINEL ADMINISTRATIVO</strong></header>
+
+<div class="config-precos">
+    <label style="font-size: 14px; margin-bottom: 10px;">📊 ATUALIZAR PREÇOS DA SACA (R$)</label>
+    <div class="grid-precos">
+        <div>
+            <label>Novo (até 200 def)</label>
+            <input type="number" id="p_novo200" step="0.01">
+        </div>
+        <div>
+            <label>Velho (até 200 def)</label>
+            <input type="number" id="p_velho200" step="0.01">
+        </div>
+        <div>
+            <label>Até 300 defeitos</label>
+            <input type="number" id="p_300" step="0.01">
+        </div>
+    </div>
+    <button id="btnSalvarPreco" onclick="salvarPrecos()">ATUALIZAR PREÇOS NO SISTEMA</button>
+</div>
 
 <div class="card">
     <table>
@@ -55,13 +77,31 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    // Carregar preços atuais nos campos
+    database.ref('precos').on('value', (snap) => {
+        const p = snap.val();
+        if(p) {
+            document.getElementById('p_novo200').value = p.novo200;
+            document.getElementById('p_velho200').value = p.velho200;
+            document.getElementById('p_300').value = p.def300;
+        }
+    });
+
+    function salvarPrecos() {
+        const dados = {
+            novo200: document.getElementById('p_novo200').value,
+            velho200: document.getElementById('p_velho200').value,
+            def300: document.getElementById('p_300').value
+        };
+        database.ref('precos').set(dados).then(() => alert("Preços atualizados para todos os corretores!"));
+    }
+
     database.ref('compras').on('value', (snap) => {
         const corpo = document.getElementById('tabela');
         corpo.innerHTML = "";
-        let itens = [];
         snap.forEach(item => {
             const v = item.val();
-            itens.push(`
+            corpo.innerHTML = `
                 <tr>
                     <td>${v.dataHr}</td>
                     <td><b>${v.nome}</b><br><small>${v.cpf}</small></td>
@@ -71,9 +111,8 @@
                     <td><small>${v.observacao || '-'}</small></td>
                     <td><span class="btn-del" onclick="apagar('${item.key}')">Apagar</span></td>
                 </tr>
-            `);
+            ` + corpo.innerHTML;
         });
-        corpo.innerHTML = itens.reverse().join('');
     });
 
     function apagar(id) { if(confirm("Apagar registro?")) database.ref('compras/'+id).remove(); }
