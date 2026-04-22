@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN - TUTA CAFÉ</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --cafe-dark: #3e2723;
+            --cafe-primary: #5d4037;
+            --cafe-accent: #d84315;
+            --bg-body: #f4f1ea;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Cabeçalho Responsivo */
+        header {
+            background: linear-gradient(135deg, var(--cafe-dark) 0%, var(--cafe-primary) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
+        header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Botão de Atualizar */
+        .actions-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .btn-refresh {
+            background-color: var(--cafe-primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Tabela Responsiva - Técnica de Mobile Cards */
+        .data-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #efebe9;
+            color: var(--cafe-dark);
+            padding: 15px;
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #d7ccc8;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        /* Estilização dos dados específicos */
+        .produtor-info b { color: var(--cafe-dark); font-size: 15px; }
+        .senha-sefaz {
+            background: #fff3e0;
+            color: var(--cafe-accent);
+            font-weight: bold;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #ffe0b2;
+            font-family: monospace;
+            font-size: 16px;
+            display: inline-block;
+        }
+        .armazem-tag { color: #5d4037; font-weight: bold; display: block; margin-bottom: 4px; }
+        .qtd-badge { font-weight: 900; color: #1b5e20; font-size: 16px; }
+        .obs-text { font-size: 12px; color: #666; font-style: italic; max-width: 250px; }
+
+        .btn-delete {
+            color: #d32f2f;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: underline;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        /* RESPONSIVIDADE PARA CELULAR (TELA < 768px) */
+        @media screen and (max-width: 768px) {
+            table, thead, tbody, th, td, tr { display: block; }
+            
+            thead tr { position: absolute; top: -9999px; left: -9999px; }
+
+            tr {
+                border: 2px solid #d7ccc8;
+                margin-bottom: 15px;
+                border-radius: 10px;
+                background: #fff;
+            }
+
+            td {
+                border: none;
+                border-bottom: 1px solid #f9f9f9;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+                min-height: 25px;
+            }
+
+            td:before {
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                width: 40%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                text-align: left;
+                color: var(--cafe-primary);
+                content: attr(data-label);
+                text-transform: uppercase;
+                font-size: 11px;
+            }
+
+            .obs-text { max-width: 100%; text-align: right; }
+            .senha-sefaz { margin-top: 5px; }
+        }
+
+        #loader { text-align: center; padding: 50px; font-style: italic; color: var(--cafe-primary); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SISTEMA DE COMPRA TUTA CAFÉ</h1>
+    <p>Painel Administrativo de Pagamentos e NF</p>
+</header>
+
+<div class="container">
+    <div class="actions-bar">
+        <button class="btn-refresh" onclick="window.location.reload()">🔄 Sincronizar Dados</button>
+    </div>
+
+    <div class="data-card">
+        <div id="loader">☕ Consultando registros no banco de dados...</div>
+        <table id="tabelaCompras" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Produtor</th>
+                    <th>Senha SEFAZ</th>
+                    <th>Banco / Ag / Conta</th>
+                    <th>Armazém / Qtd</th>
+                    <th>Observações</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDE87l7QnjS48AT8jLOGLBDP2vwyGyHNEs",
+  authDomain: "sistemacafe-e4a42.firebaseapp.com",
+  projectId: "sistemacafe-e4a42",
+  storageBucket: "sistemacafe-e4a42.firebasestorage.app",
+  messagingSenderId: "483940361596",
+  appId: "1:483940361596:web:4418541808c717276c70f9",
+  measurementId: "G-BZEK0SJ5WD"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+    // Carregamento em Tempo Real
+    database.ref('compras').orderByChild('timestamp').on('value', (snapshot) => {
+        const corpo = document.getElementById('corpoTabela');
+        const loader = document.getElementById('loader');
+        const tabela = document.getElementById('tabelaCompras');
+        
+        corpo.innerHTML = "";
+        
+        if (snapshot.exists()) {
+            loader.style.display = 'none';
+            tabela.style.display = 'table';
+            
+            let registros = [];
+            snapshot.forEach((item) => {
+                const c = item.val();
+                registros.push(`
+                    <tr>
+                        <td data-label="Data/Hora">${c.dataHr}</td>
+                        <td data-label="Produtor" class="produtor-info"><b>${c.nome}</b><br><small>${c.cpf}</small></td>
+                        <td data-label="Senha SEFAZ"><span class="senha-sefaz">${c.sefaz}</span></td>
+                        <td data-label="Banco">B:${c.banco}<br>Ag:${c.agencia} / C:${c.conta}<br><small>${c.tipo}</small></td>
+                        <td data-label="Local/Volume">
+                            <span class="armazem-tag">🏢 ${c.armazem || 'Não inf.'}</span>
+                            <span class="qtd-badge">${c.qtd} ${c.unidade}</span>
+                        </td>
+                        <td data-label="Observação">
+                            <div class="obs-text">${c.observacao || '-'}</div>
+                        </td>
+                        <td data-label="Ação">
+                            <button class="btn-delete" onclick="remover('${item.key}', '${c.nome}')">Excluir</button>
+                        </td>
+                    </tr>
+                `);
+            });
+            corpo.innerHTML = registros.reverse().join('');
+        } else {
+            loader.innerText = "Nenhuma compra registrada até o momento.";
+        }
+    });
+
+    function remover(id, nome) {
+        if(confirm("Deseja realmente apagar o registro de " + nome + "?")) {
+            database.ref('compras/' + id).remove();
+        }
+    }
+</script>
+
+</body>
+</html>
