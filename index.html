@@ -8,70 +8,63 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         :root { --primary: #3e2723; --accent: #8d6e63; --bg: #f0f0f0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
-        
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; font-size: 14px; }
         .no-print { margin-bottom: 20px; }
-        header { background: var(--primary); color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        
+        header { background: var(--primary); color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
         .box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .grid-precos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-weight: bold; color: var(--primary); }
-        
-        .btn-update { background: #2e7d32; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
-        .btn-print-geral { background: #546e7a; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-
-        .table-container { background: white; border-radius: 8px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1000px; }
-        th { background: #efebe9; padding: 12px; text-align: left; border-bottom: 2px solid #d7ccc8; color: var(--primary); text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        
-        .badge-senha { background: #fff3e0; color: #e65100; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-weight: bold; border: 1px solid #ffe0b2; }
-        .status-pago { color: white; background: #2e7d32; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
-        .status-pendente { color: white; background: #c62828; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
-        
-        .btn-action { padding: 6px 10px; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; margin: 2px; font-size: 10px; font-weight: bold; transition: 0.2s; }
-        .btn-action:hover { background: #eee; }
-
-        /* Estilo de Impressão */
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label { display: block; font-size: 11px; font-weight: bold; color: var(--accent); margin-bottom: 4px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .btn { background: #2e7d32; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-blue { background: #1565c0; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; min-width: 1100px; }
+        th { background: #efebe9; padding: 10px; text-align: left; border-bottom: 2px solid #d7ccc8; color: var(--primary); }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .badge-corretor { background: #e1f5fe; color: #01579b; padding: 4px 8px; border-radius: 20px; font-weight: bold; border: 1px solid #b3e5fc; text-transform: uppercase; font-size: 10px; }
+        .badge-senha { background: #fff3e0; color: #e65100; font-family: monospace; padding: 2px 5px; border-radius: 4px; }
+        .status-pago { color: white; background: #2e7d32; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
+        .status-pendente { color: white; background: #c62828; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
         .print-only { display: none; }
-        @media print {
-            .no-print { display: none; }
-            .print-only { display: block; }
-            body { background: white; }
-            .receipt { border: 2px solid #333; padding: 25px; margin-bottom: 30px; page-break-after: always; position: relative; }
-            .receipt h2 { text-align: center; color: #3e2723; margin-top: 0; }
-        }
+        @media print { .no-print { display: none; } .print-only { display: block; } .receipt { border: 2px solid #000; padding: 20px; margin-bottom: 20px; page-break-after: always; } }
     </style>
 </head>
 <body>
 
 <div class="no-print">
-    <header>
-        <h1>TUTA CAFÉ - PAINEL ADMINISTRATIVO</h1>
-    </header>
+    <header><h1>TUTA CAFÉ - ADM</h1></header>
 
-    <div class="box">
-        <strong style="display:block; margin-bottom:10px; color: var(--primary)">📊 CONTROLE DE COTAÇÃO DO DIA</strong>
-        <div class="grid-precos">
-            <div><label>NOVO (200 DEF)</label><input type="number" id="p_novo200" step="0.01"></div>
-            <div><label>VELHO (200 DEF)</label><input type="number" id="p_velho200" step="0.01"></div>
-            <div><label>ATÉ 300 DEF</label><input type="number" id="p_300" step="0.01"></div>
+    <div class="grid-2">
+        <div class="box">
+            <strong>COTAÇÃO</strong>
+            <div class="grid-3">
+                <div><label>NOVO</label><input type="number" id="p_novo200"></div>
+                <div><label>VELHO</label><input type="number" id="p_velho200"></div>
+                <div><label>300 DEF</label><input type="number" id="p_300"></div>
+            </div>
+            <button class="btn" onclick="salvarPrecos()">ATUALIZAR PREÇOS</button>
         </div>
-        <button class="btn-update" onclick="salvarPrecos()">PUBLICAR NOVA COTAÇÃO</button>
+
+        <div class="box">
+            <strong>CADASTRAR CORRETOR</strong>
+            <div class="grid-2">
+                <div><label>USUÁRIO</label><input type="text" id="c_user" placeholder="Ex: joao"></div>
+                <div><label>SENHA</label><input type="text" id="c_pass" placeholder="123"></div>
+            </div>
+            <button class="btn btn-blue" onclick="salvarCorretor()">CADASTRAR ACESSO</button>
+        </div>
     </div>
 
-    <button class="btn-print-geral" onclick="window.print()">🖨️ GERAR RELATÓRIO DE VENDAS GERAL</button>
-
-    <div class="table-container">
+    <div class="box" style="overflow-x:auto">
         <table>
             <thead>
                 <tr>
-                    <th>Data/Hora</th>
-                    <th>Produtor / CPF</th>
+                    <th>Data</th>
+                    <th>Corretor</th>
+                    <th>Produtor</th>
                     <th>Senha SEFAZ</th>
-                    <th>Dados Bancários</th>
-                    <th>Carga / Local</th>
+                    <th>Banco/Conta</th>
+                    <th>Carga</th>
                     <th>Status</th>
                     <th>Ações</th>
                 </tr>
@@ -96,7 +89,26 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Sincronizar Preços
+    function salvarPrecos() {
+        database.ref('precos').set({
+            novo200: document.getElementById('p_novo200').value,
+            velho200: document.getElementById('p_velho200').value,
+            def300: document.getElementById('p_300').value
+        }).then(() => alert("Cotação atualizada!"));
+    }
+
+    function salvarCorretor() {
+        const u = document.getElementById('c_user').value.toLowerCase().trim();
+        const s = document.getElementById('c_pass').value.trim();
+        if(u && s) {
+            database.ref('usuarios/' + u).set({senha: s}).then(() => {
+                alert("Corretor " + u + " cadastrado!");
+                document.getElementById('c_user').value = "";
+                document.getElementById('c_pass').value = "";
+            });
+        }
+    }
+
     database.ref('precos').on('value', snap => {
         const p = snap.val();
         if(p){
@@ -106,77 +118,34 @@
         }
     });
 
-    function salvarPrecos() {
-        database.ref('precos').set({
-            novo200: document.getElementById('p_novo200').value,
-            velho200: document.getElementById('p_velho200').value,
-            def300: document.getElementById('p_300').value
-        }).then(() => alert("✅ Cotação atualizada com sucesso!"));
-    }
-
-    // Listar Compras e Gerar Recibos
     database.ref('compras').on('value', snap => {
         const body = document.getElementById('tabelaBody');
-        const printArea = document.getElementById('printArea');
-        body.innerHTML = ""; printArea.innerHTML = "";
+        body.innerHTML = "";
+        let lista = [];
+        snap.forEach(item => { lista.push({id: item.key, ...item.val()}); });
         
-        let comprasArray = [];
-        snap.forEach(item => {
-            comprasArray.push({id: item.key, ...item.val()});
-        });
-
-        // Mostrar os mais recentes primeiro
-        comprasArray.reverse().forEach(v => {
-            const statusClass = v.status === 'PAGO' ? 'status-pago' : 'status-pendente';
-
-            // Adicionar linha na tabela ADM
+        lista.reverse().forEach(v => {
+            const st = v.status === 'PAGO' ? 'status-pago' : 'status-pendente';
             body.innerHTML += `
                 <tr>
                     <td>${v.dataHr}</td>
-                    <td><b>${v.nome}</b><br><small>${v.cpf}</small></td>
+                    <td><span class="badge-corretor">${v.corretor || 'S/ IDENT'}</span></td>
+                    <td><b>${v.nome}</b><br>${v.cpf}</td>
                     <td><span class="badge-senha">${v.sefaz}</span></td>
-                    <td><small>${v.banco}<br>Ag: ${v.agencia} | Cc: ${v.conta}</small></td>
-                    <td><b>${v.qtd} ${v.unidade}</b><br><small>${v.tipoCafe}<br>📍 ${v.armazem}</small></td>
-                    <td><span class="${statusClass}">${v.status}</span></td>
+                    <td>${v.banco}<br>Ag:${v.agencia} C:${v.conta}</td>
+                    <td>${v.qtd} ${v.unidade}<br><small>${v.tipoCafe}</small></td>
+                    <td><span class="${st}">${v.status}</span></td>
                     <td>
-                        <button class="btn-action" onclick="toggleStatus('${v.id}', '${v.status}')" title="Mudar Status">✅ Pago/Pend</button>
-                        <button class="btn-action" onclick="window.print()" title="Imprimir Recibo">🖨️ Recibo</button>
-                        <button class="btn-action" style="color:#c62828" onclick="apagar('${v.id}')">🗑️</button>
+                        <button onclick="toggleStatus('${v.id}','${v.status}')">✅</button>
+                        <button onclick="apagar('${v.id}')">🗑️</button>
                     </td>
                 </tr>
-            `;
-
-            // Gerar visual do recibo para a impressão
-            printArea.innerHTML += `
-                <div class="receipt">
-                    <h2 style="text-decoration:underline">COMPROVANTE DE AQUISIÇÃO - TUTA CAFÉ</h2>
-                    <p><strong>DATA DO REGISTRO:</strong> ${v.dataHr}</p>
-                    <hr>
-                    <p><strong>PRODUTOR:</strong> ${v.nome}</p>
-                    <p><strong>CPF/CNPJ:</strong> ${v.cpf} | <strong>SENHA SEFAZ:</strong> ${v.sefaz}</p>
-                    <p><strong>PAGAMENTO:</strong> ${v.banco} | AG: ${v.agencia} | CONTA: ${v.conta}</p>
-                    <hr>
-                    <p><strong>PRODUTO:</strong> ${v.tipoCafe}</p>
-                    <p><strong>QUANTIDADE:</strong> ${v.qtd} ${v.unidade}</p>
-                    <p><strong>LOCAL DE RETIRADA:</strong> ${v.armazem}</p>
-                    <p><strong>OBSERVAÇÕES:</strong> ${v.observacao || 'Nenhuma'}</p>
-                    <p><strong>STATUS ATUAL:</strong> ${v.status}</p>
-                    <br><br><br>
-                    <div style="display:flex; justify-content:space-around">
-                        <div style="border-top: 1px solid #000; width: 200px; text-align:center">Assinatura Tuta Café</div>
-                        <div style="border-top: 1px solid #000; width: 200px; text-align:center">Assinatura Produtor</div>
-                    </div>
-                </div>
             `;
         });
     });
 
-    function toggleStatus(id, atual) {
-        const novo = atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE';
-        database.ref('compras/'+id).update({status: novo});
-    }
-
-    function apagar(id) { if(confirm("Tem certeza que deseja apagar este registro permanentemente?")) database.ref('compras/'+id).remove(); }
+    function toggleStatus(id, atual) { database.ref('compras/'+id).update({status: atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE'}); }
+    function apagar(id) { if(confirm("Apagar?")) database.ref('compras/'+id).remove(); }
 </script>
 </body>
 </html>
