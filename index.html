@@ -9,56 +9,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #3e2723; --accent: #8d6e63; --bg: #f4f4f4; --success: #2e7d32; --danger: #c62828; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 14px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; }
         
-        header { background: var(--primary); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
+        header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
+        h1 { margin: 0; font-size: 20px; }
 
-        .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .box h2 { font-size: 16px; margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .box h2 { font-size: 14px; margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 8px; }
 
-        .input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+        label { display: block; font-size: 10px; font-weight: bold; color: var(--accent); margin-bottom: 3px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; }
         
-        .btn { background: var(--success); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+        .btn { background: var(--success); color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .btn-blue { background: #1565c0; }
-        .btn:hover { opacity: 0.9; }
 
-        .table-container { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { text-align: left; background: #fafafa; padding: 12px; border-bottom: 2px solid #eee; color: #666; font-size: 12px; }
-        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .table-container { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { text-align: left; background: #fafafa; padding: 10px; border-bottom: 2px solid #eee; font-size: 11px; color: #777; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
 
-        .badge-corretor { background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
-        .status-pago { background: #e8f5e9; color: var(--success); padding: 4px 8px; border-radius: 6px; font-weight: bold; }
-        .status-pendente { background: #ffebee; color: var(--danger); padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+        .badge-corretor { background: #e3f2fd; color: #1565c0; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; }
+        .status-pago { color: var(--success); font-weight: bold; }
+        .status-pendente { color: var(--danger); font-weight: bold; }
         
-        .btn-action { padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 12px; margin-right: 5px; }
-        .btn-action:hover { background: #f0f0f0; }
+        .btn-action { padding: 5px 8px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 14px; margin-right: 3px; transition: 0.2s; }
+        .btn-action:hover { background: #f0f0f0; border-color: #bbb; }
 
-        /* ESTILO DE IMPRESSÃO - CONFIGURAÇÃO COMPLETA */
+        /* ESTILO DE IMPRESSÃO COMPACTO */
         #printArea { display: none; }
         @media print {
-            body { background: white; padding: 0; }
-            .no-print { display: none; }
-            #printArea { display: block; width: 100%; }
+            .no-print { display: none !important; }
+            #printArea { display: block !important; width: 100%; }
             .receipt { 
-                border: 1px solid #000; padding: 30px; margin: 10px; font-family: sans-serif;
-                page-break-after: always; color: black; line-height: 1.6;
+                border: 1px solid #000; padding: 15px; margin: 0 auto; width: 90%;
+                font-family: Arial, sans-serif; font-size: 11px; line-height: 1.4; color: #000;
+                page-break-after: always;
             }
-            .receipt h2 { text-align: center; border-bottom: 1px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-            .info-row { margin-bottom: 10px; border-bottom: 1px dotted #ccc; padding-bottom: 5px; }
-            .sig-area { display: flex; justify-content: space-between; margin-top: 60px; }
-            .sig-box { border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 10px; font-size: 12px; }
+            .receipt h3 { text-align: center; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px; }
+            .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 15px; }
+            .full-row { grid-column: span 2; border-top: 1px dotted #888; padding-top: 3px; margin-top: 3px; }
+            .sig-area { display: flex; justify-content: space-between; margin-top: 35px; }
+            .sig-box { border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 4px; font-size: 9px; }
         }
     </style>
 </head>
 <body>
 
 <div class="no-print">
-    <header><h1>PAINEL ADM - TUTA CAFÉ</h1></header>
+    <header><h1>TUTA CAFÉ - ADMINISTRATIVO</h1></header>
 
     <div class="grid-top">
         <div class="box">
@@ -72,7 +72,7 @@
         </div>
 
         <div class="box">
-            <h2>Cadastrar Corretor</h2>
+            <h2>Novo Corretor</h2>
             <div class="input-group" style="grid-template-columns: 1fr 1fr;">
                 <div><label>USUÁRIO</label><input type="text" id="c_user"></div>
                 <div><label>SENHA</label><input type="text" id="c_pass"></div>
@@ -85,11 +85,11 @@
         <table>
             <thead>
                 <tr>
-                    <th>Data/Hora</th>
+                    <th>Data</th>
                     <th>Corretor</th>
                     <th>Produtor</th>
-                    <th>Dados Bancários</th>
-                    <th>Carga / Preço</th>
+                    <th>Pagamento</th>
+                    <th>Carga</th>
                     <th>Status</th>
                     <th>Ações</th>
                 </tr>
@@ -119,7 +119,7 @@
             novo200: document.getElementById('p_novo').value,
             velho200: document.getElementById('p_velho').value,
             def300: document.getElementById('p_300').value
-        }).then(() => alert("Preços atualizados!"));
+        }).then(() => alert("Cotações Atualizadas!"));
     }
 
     function salvarCorretor() {
@@ -127,7 +127,7 @@
         const s = document.getElementById('c_pass').value.trim();
         if(u && s) {
             database.ref('usuarios/' + u).set({senha: s}).then(() => {
-                alert("Corretor cadastrado!");
+                alert("Acesso Criado!");
                 document.getElementById('c_user').value = ""; document.getElementById('c_pass').value = "";
             });
         }
@@ -152,43 +152,45 @@
 
         lista.reverse().forEach(v => {
             const stClass = v.status === 'PAGO' ? 'status-pago' : 'status-pendente';
-            const valorSaca = v.valorSaca ? "R$ " + parseFloat(v.valorSaca).toLocaleString('pt-BR') : "---";
+            const valorF = v.valorSaca ? "R$ " + parseFloat(v.valorSaca).toLocaleString('pt-BR') : "---";
 
             body.innerHTML += `
                 <tr>
-                    <td>${v.dataHr}</td>
+                    <td><small>${v.dataHr}</small></td>
                     <td><span class="badge-corretor">${v.corretor || '---'}</span></td>
-                    <td><b>${v.nome}</b><br><small>CPF: ${v.cpf}<br>Senha: ${v.sefaz}</small></td>
-                    <td>${v.banco}<br><small>Ag: ${v.agencia} | Cc: ${v.conta}</small></td>
-                    <td><b>${v.qtd} ${v.unidade}</b><br><small>${v.tipoCafe}<br><b>Saca: ${valorSaca}</b></small></td>
+                    <td><b>${v.nome}</b><br><small>${v.cpf}</small></td>
+                    <td><small>${v.banco}<br>Ag: ${v.agencia} / Cc: ${v.conta}</small></td>
+                    <td><b>${v.qtd} ${v.unidade}</b><br><small>${valorF}</small></td>
                     <td><span class="${stClass}">${v.status}</span></td>
                     <td>
-                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')">Status</button>
-                        <button class="btn-action" onclick="imprimir('${v.id}')">Imprimir</button>
+                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')" title="Alterar Status">✅</button>
+                        <button class="btn-action" onclick="imprimir('${v.id}')" title="Imprimir Recibo">🖨️</button>
+                        <button class="btn-action" onclick="remover('${v.id}')" title="Excluir" style="border-color:#ffcdd2">🗑️</button>
                     </td>
                 </tr>
             `;
 
             printArea.innerHTML += `
                 <div class="receipt" id="rec-print-${v.id}">
-                    <h2>TUTA CAFÉ - COMPROVANTE DE REGISTRO</h2>
-                    <div class="info-row"><strong>CORRETOR:</strong> ${v.corretor ? v.corretor.toUpperCase() : '-'}</div>
-                    <div class="info-row"><strong>DATA/HORA:</strong> ${v.dataHr}</div>
-                    <div class="info-row"><strong>PRODUTOR:</strong> ${v.nome} | <strong>CPF/CNPJ:</strong> ${v.cpf}</div>
-                    <div class="info-row"><strong>SENHA SEFAZ:</strong> ${v.sefaz}</div>
-                    <hr>
-                    <div class="info-row"><strong>BANCO:</strong> ${v.banco}</div>
-                    <div class="info-row"><strong>AGÊNCIA:</strong> ${v.agencia} | <strong>CONTA:</strong> ${v.conta}</div>
-                    <hr>
-                    <div class="info-row"><strong>CLASSIFICAÇÃO:</strong> ${v.tipoCafe}</div>
-                    <div class="info-row"><strong>QUANTIDADE:</strong> ${v.qtd} ${v.unidade}</div>
-                    <div class="info-row"><strong>VALOR POR SACA:</strong> ${valorSaca}</div>
-                    <div class="info-row"><strong>LOCAL DE RETIRADA:</strong> ${v.armazem}</div>
-                    <div class="info-row"><strong>OBS:</strong> ${v.observacao || 'Nenhuma'}</div>
-                    
+                    <h3>COMPRA EFETUADA - TUTA CAFÉ</h3>
+                    <div class="receipt-grid">
+                        <div><strong>Data:</strong> ${v.dataHr}</div>
+                        <div><strong>Corretor:</strong> ${v.corretor ? v.corretor.toUpperCase() : '-'}</div>
+                        <div class="full-row"><strong>Produtor:</strong> ${v.nome}</div>
+                        <div><strong>CPF/CNPJ:</strong> ${v.cpf}</div>
+                        <div><strong>Sefaz:</strong> ${v.sefaz}</div>
+                        <div class="full-row"><strong>Banco:</strong> ${v.banco}</div>
+                        <div><strong>Ag:</strong> ${v.agencia}</div>
+                        <div><strong>Conta:</strong> ${v.conta}</div>
+                        <div class="full-row"><strong>Classif:</strong> ${v.tipoCafe}</div>
+                        <div><strong>Qtd:</strong> ${v.qtd} ${v.unidade}</div>
+                        <div><strong>Vlr Saca:</strong> ${valorF}</div>
+                        <div class="full-row"><strong>Local:</strong> ${v.armazem}</div>
+                        <div class="full-row" style="font-size:9px"><strong>OBS:</strong> ${v.observacao || 'Nenhuma'}</div>
+                    </div>
                     <div class="sig-area">
-                        <div class="sig-box">Assinatura do Corretor<br><small>(${v.corretor || '________________'})</small></div>
-                        <div class="sig-box">Assinatura do Produtor<br><small>(________________________________)</small></div>
+                        <div class="sig-box">Assinatura Corretor</div>
+                        <div class="sig-box">Assinatura Produtor</div>
                     </div>
                 </div>
             `;
@@ -199,11 +201,20 @@
         database.ref('compras/'+id).update({ status: atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE' });
     }
 
+    function remover(id) {
+        if(confirm("Deseja EXCLUIR este registro permanentemente?")) {
+            database.ref('compras/'+id).remove();
+        }
+    }
+
     function imprimir(id) {
         const todos = document.querySelectorAll('.receipt');
         todos.forEach(r => r.style.display = 'none');
-        document.getElementById('rec-print-' + id).style.display = 'block';
-        window.print();
+        const Alvo = document.getElementById('rec-print-' + id);
+        if(Alvo) {
+            Alvo.style.display = 'block';
+            window.print();
+        }
     }
 </script>
 </body>
