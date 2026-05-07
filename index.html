@@ -1,151 +1,71 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADM - Gestão Tuta Café</title>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <style>
-        :root { --primary: #3e2723; --accent: #8d6e63; --bg: #f0f0f0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; font-size: 14px; }
-        .no-print { margin-bottom: 20px; }
-        header { background: var(--primary); color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
-        .box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: var(--accent); margin-bottom: 4px; }
-        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .btn { background: #2e7d32; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .btn-blue { background: #1565c0; }
-        table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; min-width: 1100px; }
-        th { background: #efebe9; padding: 10px; text-align: left; border-bottom: 2px solid #d7ccc8; color: var(--primary); }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
-        .badge-corretor { background: #e1f5fe; color: #01579b; padding: 4px 8px; border-radius: 20px; font-weight: bold; border: 1px solid #b3e5fc; text-transform: uppercase; font-size: 10px; }
-        .badge-senha { background: #fff3e0; color: #e65100; font-family: monospace; padding: 2px 5px; border-radius: 4px; }
-        .status-pago { color: white; background: #2e7d32; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
-        .status-pendente { color: white; background: #c62828; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
-        .print-only { display: none; }
-        @media print { .no-print { display: none; } .print-only { display: block; } .receipt { border: 2px solid #000; padding: 20px; margin-bottom: 20px; page-break-after: always; } }
-    </style>
-</head>
-<body>
-
-<div class="no-print">
-    <header><h1>TUTA CAFÉ - ADM</h1></header>
-
-    <div class="grid-2">
-        <div class="box">
-            <strong>COTAÇÃO</strong>
-            <div class="grid-3">
-                <div><label>NOVO</label><input type="number" id="p_novo200"></div>
-                <div><label>VELHO</label><input type="number" id="p_velho200"></div>
-                <div><label>300 DEF</label><input type="number" id="p_300"></div>
-            </div>
-            <button class="btn" onclick="salvarPrecos()">ATUALIZAR PREÇOS</button>
-        </div>
-
-        <div class="box">
-            <strong>CADASTRAR CORRETOR</strong>
-            <div class="grid-2">
-                <div><label>USUÁRIO</label><input type="text" id="c_user" placeholder="Ex: joao"></div>
-                <div><label>SENHA</label><input type="text" id="c_pass" placeholder="123"></div>
-            </div>
-            <button class="btn btn-blue" onclick="salvarCorretor()">CADASTRAR ACESSO</button>
-        </div>
-    </div>
-
-    <div class="box" style="overflow-x:auto">
-        <table>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Corretor</th>
-                    <th>Produtor</th>
-                    <th>Senha SEFAZ</th>
-                    <th>Banco/Conta</th>
-                    <th>Carga</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaBody"></tbody>
-        </table>
-    </div>
-</div>
-
-<div id="printArea" class="print-only"></div>
+<style>
+    /* Estilos específicos para impressão do recibo */
+    .receipt { display: none; }
+    @media print {
+        .no-print { display: none; }
+        .receipt { 
+            display: block; 
+            border: 2px solid #333; 
+            padding: 30px; 
+            margin: 20px; 
+            font-family: sans-serif;
+            page-break-after: always;
+        }
+        .signature-box { display: flex; justify-content: space-between; margin-top: 60px; }
+        .sig { border-top: 1px solid #000; width: 40%; text-align: center; padding-top: 5px; font-size: 12px; }
+    }
+    .badge-corretor { background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+</style>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDE87l7QnjS48AT8jLOGLBDP2vwyGyHNEs",
-        authDomain: "sistemacafe-e4a42.firebaseapp.com",
-        databaseURL: "https://sistemacafe-e4a42-default-rtdb.firebaseio.com", 
-        projectId: "sistemacafe-e4a42",
-        storageBucket: "sistemacafe-e4a42.firebasestorage.app",
-        messagingSenderId: "483940361596",
-        appId: "1:483940361596:web:4418541808c717276c70f9"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    function salvarPrecos() {
-        database.ref('precos').set({
-            novo200: document.getElementById('p_novo200').value,
-            velho200: document.getElementById('p_velho200').value,
-            def300: document.getElementById('p_300').value
-        }).then(() => alert("Cotação atualizada!"));
-    }
-
-    function salvarCorretor() {
-        const u = document.getElementById('c_user').value.toLowerCase().trim();
-        const s = document.getElementById('c_pass').value.trim();
-        if(u && s) {
-            database.ref('usuarios/' + u).set({senha: s}).then(() => {
-                alert("Corretor " + u + " cadastrado!");
-                document.getElementById('c_user').value = "";
-                document.getElementById('c_pass').value = "";
-            });
-        }
-    }
-
-    database.ref('precos').on('value', snap => {
-        const p = snap.val();
-        if(p){
-            document.getElementById('p_novo200').value = p.novo200;
-            document.getElementById('p_velho200').value = p.velho200;
-            document.getElementById('p_300').value = p.def300;
-        }
-    });
-
     database.ref('compras').on('value', snap => {
         const body = document.getElementById('tabelaBody');
-        body.innerHTML = "";
-        let lista = [];
-        snap.forEach(item => { lista.push({id: item.key, ...item.val()}); });
+        const printArea = document.getElementById('printArea'); // Div oculta para gerar recibos
+        body.innerHTML = ""; printArea.innerHTML = "";
         
-        lista.reverse().forEach(v => {
-            const st = v.status === 'PAGO' ? 'status-pago' : 'status-pendente';
+        let registros = [];
+        snap.forEach(i => { registros.push({id: i.key, ...i.val()}); });
+
+        registros.reverse().forEach(v => {
+            const statusClass = v.status === 'PAGO' ? 'status-pago' : 'status-pendente';
+            const val = v.valorSaca ? "R$ " + parseFloat(v.valorSaca).toLocaleString('pt-BR') : "---";
+
+            // Linha da Tabela
             body.innerHTML += `
                 <tr>
                     <td>${v.dataHr}</td>
-                    <td><span class="badge-corretor">${v.corretor || 'S/ IDENT'}</span></td>
-                    <td><b>${v.nome}</b><br>${v.cpf}</td>
+                    <td><span class="badge-corretor">${v.corretor || '---'}</span></td>
+                    <td><b>${v.nome}</b><br><small>${v.cpf}</small></td>
                     <td><span class="badge-senha">${v.sefaz}</span></td>
-                    <td>${v.banco}<br>Ag:${v.agencia} C:${v.conta}</td>
-                    <td>${v.qtd} ${v.unidade}<br><small>${v.tipoCafe}</small></td>
-                    <td><span class="${st}">${v.status}</span></td>
+                    <td>${v.banco}<br>Ag: ${v.agencia} | Cc: ${v.conta}</td>
+                    <td><b>${v.qtd} ${v.unidade}</b><br>Valor: ${val}</td>
+                    <td><span class="${statusClass}">${v.status}</span></td>
                     <td>
-                        <button onclick="toggleStatus('${v.id}','${v.status}')">✅</button>
-                        <button onclick="apagar('${v.id}')">🗑️</button>
+                        <button onclick="toggleStatus('${v.id}','${v.status}')">Status</button>
+                        <button onclick="window.print()">Imprimir</button>
                     </td>
                 </tr>
             `;
+
+            // Gerador de Recibo para Impressão
+            printArea.innerHTML += `
+                <div class="receipt">
+                    <h2 style="text-align:center">TUTA CAFÉ - RECIBO DE COMPRA</h2>
+                    <hr>
+                    <p><strong>CORRETOR:</strong> ${v.corretor ? v.corretor.toUpperCase() : '---'}</p>
+                    <p><strong>PRODUTOR:</strong> ${v.nome} | <strong>CPF/CNPJ:</strong> ${v.cpf}</p>
+                    <p><strong>SENHA SEFAZ:</strong> ${v.sefaz}</p>
+                    <hr>
+                    <p><strong>CARGA:</strong> ${v.qtd} ${v.unidade} - ${v.tipoCafe}</p>
+                    <p><strong>VALOR UNITÁRIO:</strong> ${val}</p>
+                    <p><strong>LOCAL:</strong> ${v.armazem}</p>
+                    <p><strong>DATA:</strong> ${v.dataHr}</p>
+                    <div class="signature-box">
+                        <div class="sig">Assinatura do Corretor<br>(${v.corretor || '________________'})</div>
+                        <div class="sig">Assinatura do Produtor<br>(________________________________)</div>
+                    </div>
+                </div>
+            `;
         });
     });
-
-    function toggleStatus(id, atual) { database.ref('compras/'+id).update({status: atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE'}); }
-    function apagar(id) { if(confirm("Apagar?")) database.ref('compras/'+id).remove(); }
 </script>
-</body>
-</html>
