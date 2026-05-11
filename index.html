@@ -10,46 +10,26 @@
     <style>
         :root { --primary: #3e2723; --accent: #8d6e63; --bg: #f4f4f4; --success: #2e7d32; --danger: #c62828; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; }
-        
         header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        h1 { margin: 0; font-size: 20px; letter-spacing: 1px; }
-
         .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .box h2 { font-size: 14px; margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 8px; text-transform: uppercase; }
-
         .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         label { display: block; font-size: 10px; font-weight: bold; color: var(--accent); margin-bottom: 3px; }
         input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; }
-        
         .btn { background: var(--success); color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .btn-blue { background: #1565c0; }
-
         .table-container { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
         th { text-align: left; background: #fafafa; padding: 12px; border-bottom: 2px solid #eee; font-size: 11px; color: #777; }
         td { padding: 12px; border-bottom: 1px solid #eee; }
-
         .badge-corretor { background: #e3f2fd; color: #1565c0; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; }
-        .status-pago { color: var(--success); font-weight: bold; }
-        .status-pendente { color: var(--danger); font-weight: bold; }
-        
-        .btn-action { padding: 6px 10px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 16px; margin-right: 5px; transition: 0.2s; }
-        .btn-action:hover { background: #f0f0f0; }
+        .btn-action { padding: 6px 10px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 16px; margin-right: 5px; }
 
-        /* ESTILO DE IMPRESSÃO COMPACTO (PADRÃO ANTERIOR) */
-        #printArea { display: none; }
         @media print {
             .no-print { display: none !important; }
             #printArea { display: block !important; width: 100%; }
-            .receipt { 
-                border: 1px solid #000; padding: 15px; margin: 0 auto; width: 95%;
-                font-family: Arial, sans-serif; font-size: 11px; line-height: 1.4; color: #000;
-                page-break-after: always;
-            }
-            .receipt h3 { text-align: center; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px; }
-            .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 15px; }
-            .full-row { grid-column: span 2; border-top: 1px dotted #888; padding-top: 3px; margin-top: 3px; }
+            .receipt { border: 1px solid #000; padding: 15px; margin: 0 auto; width: 95%; font-family: Arial, sans-serif; font-size: 11px; page-break-after: always; }
+            .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+            .full-row { grid-column: span 2; border-top: 1px dotted #888; padding-top: 3px; }
             .sig-area { display: flex; justify-content: space-between; margin-top: 35px; }
             .sig-box { border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 4px; font-size: 9px; }
         }
@@ -59,24 +39,22 @@
 
 <div class="no-print">
     <header><h1>TUTA CAFÉ - ADMINISTRATIVO</h1></header>
-
     <div class="grid-top">
         <div class="box">
             <h2>Cotações (200/250 Def.)</h2>
             <div class="input-group">
-                <div><label>A RETIRAR (R$)</label><input type="number" id="p_retirar" step="0.01"></div>
-                <div><label>POSTO ARMAZÉM (R$)</label><input type="number" id="p_armazem" step="0.01"></div>
+                <div><label>A RETIRAR</label><input type="number" id="p_retirar" step="0.01"></div>
+                <div><label>POSTO ARMAZÉM</label><input type="number" id="p_armazem" step="0.01"></div>
             </div>
             <button class="btn" onclick="salvarPrecos()">ATUALIZAR COTAÇÕES</button>
         </div>
-
         <div class="box">
             <h2>Novo Corretor</h2>
             <div class="input-group">
                 <div><label>USUÁRIO</label><input type="text" id="c_user"></div>
                 <div><label>SENHA</label><input type="text" id="c_pass"></div>
             </div>
-            <button class="btn btn-blue" onclick="salvarCorretor()">CADASTRAR ACESSO</button>
+            <button class="btn" style="background:#1565c0" onclick="salvarCorretor()">CADASTRAR</button>
         </div>
     </div>
 
@@ -97,7 +75,6 @@
         </table>
     </div>
 </div>
-
 <div id="printArea"></div>
 
 <script>
@@ -113,27 +90,19 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Salvar Cotações Reformuladas
     function salvarPrecos() {
         database.ref('precos').set({
             retirar: document.getElementById('p_retirar').value,
             armazem: document.getElementById('p_armazem').value
-        }).then(() => alert("Cotações Atualizadas com Sucesso!"));
+        }).then(() => alert("Cotações Atualizadas!"));
     }
 
-    // Cadastro de Corretor
     function salvarCorretor() {
         const u = document.getElementById('c_user').value.toLowerCase().trim();
         const s = document.getElementById('c_pass').value.trim();
-        if(u && s) {
-            database.ref('usuarios/' + u).set({senha: s}).then(() => {
-                alert("Corretor cadastrado!");
-                document.getElementById('c_user').value = ""; document.getElementById('c_pass').value = "";
-            });
-        }
+        if(u && s) database.ref('usuarios/' + u).set({senha: s}).then(() => alert("OK!"));
     }
 
-    // Carregar Cotações nos campos
     database.ref('precos').on('value', snap => {
         const p = snap.val();
         if(p){
@@ -142,7 +111,6 @@
         }
     });
 
-    // Carregar Tabela e Recibos Compactos
     database.ref('compras').on('value', snap => {
         const body = document.getElementById('tabelaBody');
         const printArea = document.getElementById('printArea');
@@ -152,52 +120,44 @@
         snap.forEach(item => { lista.push({id: item.key, ...item.val()}); });
 
         lista.reverse().forEach(v => {
-            const stClass = v.status === 'PAGO' ? 'status-pago' : 'status-pendente';
+            // LÓGICA DE COMPATIBILIDADE: Se qtdSacas não existir, usa a qtd antiga
+            const sacas = v.qtdSacas || v.qtd || "0";
+            const quilos = v.qtdKg || "0";
+            const pesoTexto = quilos > 0 ? `${sacas} sc + ${quilos}kg` : `${sacas} sc`;
+            
             const valorF = v.valorSaca ? "R$ " + parseFloat(v.valorSaca).toLocaleString('pt-BR') : "---";
-            const pesoFull = `${v.qtdSacas} sc ${v.qtdKg > 0 ? '+ ' + v.qtdKg + 'kg' : ''}`;
+            const stClass = v.status === 'PAGO' ? 'color:#2e7d32' : 'color:#c62828';
 
-            // Linha da Tabela ADM
             body.innerHTML += `
                 <tr>
                     <td><small>${v.dataHr}</small></td>
                     <td><span class="badge-corretor">${v.corretor || '---'}</span></td>
-                    <td><b>${v.nome}</b><br><small>CPF: ${v.cpf}<br>Senha: ${v.sefaz}</small></td>
-                    <td><small><b>${v.banco}</b><br>Ag: ${v.agencia} / Cc: ${v.conta}</small></td>
-                    <td><b>${pesoFull}</b><br><small>Saca: ${valorF}</small></td>
-                    <td><span class="${stClass}">${v.status}</span></td>
+                    <td><b>${v.nome}</b><br><small>Senha: ${v.sefaz || '-'}</small></td>
+                    <td><small>${v.banco || '-'}<br>Ag: ${v.agencia} / Cc: ${v.conta}</small></td>
+                    <td><b>${pesoTexto}</b><br><small>Saca: ${valorF}</small></td>
+                    <td style="${stClass}; font-weight:bold">${v.status}</td>
                     <td>
-                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')" title="Mudar Status">✅</button>
-                        <button class="btn-action" onclick="imprimir('${v.id}')" title="Imprimir Comprovante">🖨️</button>
-                        <button class="btn-action" onclick="remover('${v.id}')" title="Excluir" style="border-color:#ffcdd2">🗑️</button>
+                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')">✅</button>
+                        <button class="btn-action" onclick="imprimir('${v.id}')">🖨️</button>
+                        <button class="btn-action" onclick="remover('${v.id}')" style="border-color:#ffcdd2">🗑️</button>
                     </td>
                 </tr>
             `;
 
-            // Recibo Compacto Reformulado (Compra Efetuada)
             printArea.innerHTML += `
                 <div class="receipt" id="rec-print-${v.id}">
-                    <h3>COMPRA EFETUADA - TUTA CAFÉ</h3>
+                    <h3 style="text-align:center">COMPRA EFETUADA - TUTA CAFÉ</h3>
                     <div class="receipt-grid">
                         <div><strong>Data:</strong> ${v.dataHr}</div>
-                        <div><strong>Corretor:</strong> ${v.corretor ? v.corretor.toUpperCase() : '-'}</div>
-                        <div class="full-row"><strong>Produtor:</strong> ${v.nome}</div>
-                        <div><strong>CPF/CNPJ:</strong> ${v.cpf}</div>
-                        <div><strong>Sefaz:</strong> ${v.sefaz}</div>
-                        <div class="full-row"><strong>Banco:</strong> ${v.banco}</div>
-                        <div><strong>Agência:</strong> ${v.agencia}</div>
-                        <div><strong>Conta:</strong> ${v.conta}</div>
-                        <div class="full-row"><strong>Classificação:</strong> ${v.tipoCafe}</div>
-                        <div><strong>Quantidade:</strong> ${v.qtdSacas} Sacas</div>
-                        <div><strong>Peso Extra:</strong> ${v.qtdKg} Kg</div>
-                        <div><strong>Valor Saca:</strong> ${valorF}</div>
-                        <div><strong>Armazém:</strong> ${v.armazem}</div>
-                        <div class="full-row" style="font-size:9px"><strong>OBS:</strong> ${v.observacao || 'Sem observações.'}</div>
+                        <div><strong>Corretor:</strong> ${v.corretor || '-'}</div>
+                        <div class="full-row"><strong>Produtor:</strong> ${v.nome} | ${v.cpf}</div>
+                        <div><strong>Sefaz:</strong> ${v.sefaz || '-'}</div>
+                        <div class="full-row"><strong>Pagamento:</strong> ${v.banco} | Ag: ${v.agencia} Cc: ${v.conta}</div>
+                        <div class="full-row"><strong>Carga:</strong> ${sacas} Sacas ${quilos > 0 ? ' e ' + quilos + 'kg' : ''} - ${v.tipoCafe}</div>
+                        <div><strong>Vlr Saca:</strong> ${valorF}</div>
+                        <div><strong>Local:</strong> ${v.armazem}</div>
                     </div>
-                    <div class="sig-area">
-                        <div class="sig-box">Assinatura Corretor</div>
-                        <div class="sig-box">Assinatura Produtor</div>
-                    </div>
-                    <div style="text-align:center; font-size:8px; margin-top:10px;">Sistema de Gestão Tuta Café</div>
+                    <div class="sig-area"><div class="sig-box">Corretor</div><div class="sig-box">Produtor</div></div>
                 </div>
             `;
         });
@@ -206,21 +166,14 @@
     function mudarStatus(id, atual) {
         database.ref('compras/'+id).update({ status: atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE' });
     }
-
     function remover(id) {
-        if(confirm("ATENÇÃO: Deseja EXCLUIR este registro permanentemente?")) {
-            database.ref('compras/'+id).remove();
-        }
+        if(confirm("Excluir definitivamente?")) database.ref('compras/'+id).remove();
     }
-
     function imprimir(id) {
         const todos = document.querySelectorAll('.receipt');
         todos.forEach(r => r.style.display = 'none');
-        const alvo = document.getElementById('rec-print-' + id);
-        if(alvo) {
-            alvo.style.display = 'block';
-            window.print();
-        }
+        document.getElementById('rec-print-' + id).style.display = 'block';
+        window.print();
     }
 </script>
 </body>
