@@ -24,7 +24,6 @@
         td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; }
         .badge-corretor { background: #efebe9; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
         .btn-action { padding: 6px 10px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 16px; margin-right: 5px; }
-
         #printArea { display: none; }
         @media print {
             .no-print { display: none !important; }
@@ -39,7 +38,6 @@
     </style>
 </head>
 <body>
-
 <div class="no-print">
     <header><h1>TUTA CAFÉ - ADMINISTRATIVO</h1></header>
     <div class="grid-top">
@@ -92,7 +90,6 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Máscara de Moeda Dinâmica
     function mascaraMoeda(i) {
         let v = i.value.replace(/\D/g,'');
         v = (v/100).toFixed(2) + '';
@@ -107,6 +104,7 @@
     }
 
     function limparValor(valor) {
+        if(!valor) return 0;
         return parseFloat(valor.replace("R$ ", "").replace(/\./g, "").replace(",", "."));
     }
 
@@ -145,16 +143,13 @@
         snap.forEach(item => { lista.push({id: item.key, ...item.val()}); });
         lista.reverse().forEach(v => {
             const corretorNome = (v.corretor || '---').toUpperCase();
-            const sacas = v.qtdSacas || v.qtd || "0";
-            const kg = v.qtdKg || "0";
-            
             body.innerHTML += `
                 <tr>
                     <td><small>${v.dataHr}</small></td>
                     <td><span class="badge-corretor">${corretorNome}</span></td>
                     <td><b>${v.nome}</b><br><small>CPF: ${formatarDocumento(v.cpf)}<br>Senha: ${v.sefaz || '-'}</small></td>
                     <td><small><b>${v.banco || '-'}</b><br>Ag: ${v.agencia}/Cc: ${v.conta}</small></td>
-                    <td><b>${sacas}sc + ${kg}kg</b><br><small>Saca: ${formatarMoeda(v.valorSaca)}</small></td>
+                    <td><b>${v.qtdSacas}sc + ${v.qtdKg}kg</b><br><small>Saca: ${formatarMoeda(v.valorSaca)}</small></td>
                     <td style="color:${v.status === 'PAGO' ? '#2e7d32' : '#c62828'}; font-weight:bold">${v.status}</td>
                     <td>
                         <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')">✅</button>
@@ -168,9 +163,10 @@
                     <div class="receipt-header"><h3>COMPRA EFETUADA - TUTA CAFÉ</h3></div>
                     <div class="receipt-grid">
                         <div class="full-line"><strong>DATA:</strong> ${v.dataHr} | <strong>CORRETOR:</strong> ${corretorNome}</div>
-                        <div class="full-line"><strong>PRODUTOR:</strong> ${v.nome.toUpperCase()} | ${formatarDocumento(v.cpf)}</div>
+                        <div class="full-line"><strong>PRODUTOR:</strong> ${v.nome.toUpperCase()} | <strong>CPF:</strong> ${formatarDocumento(v.cpf)}</div>
+                        <div class="full-line"><strong>SENHA SEFAZ:</strong> ${v.sefaz || '---'}</div>
                         <div class="full-line"><strong>PAGAMENTO:</strong> ${v.banco} | Ag: ${v.agencia} Cc: ${v.conta}</div>
-                        <div class="full-line"><strong>CARGA:</strong> ${sacas} SACAS ${kg > 0 ? ' E ' + kg + 'KG' : ''}</div>
+                        <div class="full-line"><strong>CARGA:</strong> ${v.qtdSacas} SACAS ${v.qtdKg > 0 ? ' E ' + v.qtdKg + 'KG' : ''}</div>
                         <div><strong>VALOR SACA:</strong> ${formatarMoeda(v.valorSaca)}</div>
                         <div><strong>LOCAL:</strong> ${v.armazem}</div>
                     </div>
