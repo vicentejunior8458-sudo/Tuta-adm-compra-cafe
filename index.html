@@ -2,7 +2,6 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel ADM | Tuta Café</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -10,63 +9,57 @@
     <style>
         :root { --primary: #3e2723; --accent: #8d6e63; --bg: #f4f4f4; --success: #2e7d32; --danger: #c62828; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; color: #333; }
-        header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
         .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #ddd; }
-        .box h2 { font-size: 14px; margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 8px; text-transform: uppercase; }
         .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        label { display: block; font-size: 10px; font-weight: bold; color: var(--accent); margin-bottom: 3px; }
-        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; }
-        .btn { background: var(--success); color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .table-container { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { text-align: left; background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; font-size: 11px; color: #555; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; }
-        .badge-corretor { background: #efebe9; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
-        .btn-action { padding: 6px 10px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 16px; margin-right: 5px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .btn { background: var(--success); color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; background: white; }
+        th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        
         #printArea { display: none; }
         @media print {
             .no-print { display: none !important; }
             #printArea { display: block !important; width: 100%; }
-            .receipt { border: 2px solid #000; padding: 20px; margin: 10px auto; width: 95%; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; color: #000; page-break-after: always; }
-            .receipt-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px; }
-            .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-            .full-line { grid-column: span 2; border-bottom: 1px dotted #000; padding: 4px 0; }
-            .sig-section { display: flex; justify-content: space-between; margin-top: 50px; }
-            .sig-line { border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 5px; font-weight: bold; }
+            .receipt { border: 2px solid #000; padding: 20px; margin: 10px auto; font-family: monospace; page-break-after: always; }
+            .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            .full-line { grid-column: span 2; border-bottom: 1px dotted #000; padding: 5px 0; }
         }
     </style>
 </head>
 <body>
+
 <div class="no-print">
     <header><h1>TUTA CAFÉ - ADMINISTRATIVO</h1></header>
     <div class="grid-top">
         <div class="box">
             <h2>Cotações</h2>
             <div class="input-group">
-                <div><label>A RETIRAR</label><input type="text" id="p_retirar" oninput="mascaraMoeda(this)" placeholder="R$ 0,00"></div>
-                <div><label>POSTO ARMAZÉM</label><input type="text" id="p_armazem" oninput="mascaraMoeda(this)" placeholder="R$ 0,00"></div>
+                <div><label>A RETIRAR</label><input type="text" id="p_retirar" oninput="mascaraMoeda(this)"></div>
+                <div><label>POSTO ARMAZÉM</label><input type="text" id="p_armazem" oninput="mascaraMoeda(this)"></div>
             </div>
-            <button class="btn" onclick="salvarPrecos()">ATUALIZAR PREÇOS</button>
+            <button class="btn" style="margin-top:10px" onclick="salvarPrecos()">ATUALIZAR PREÇOS</button>
         </div>
         <div class="box">
-            <h2>Gestão de Corretores</h2>
+            <h2>Novo Corretor</h2>
             <div class="input-group">
-                <div><label>USUÁRIO</label><input type="text" id="c_user"></div>
-                <div><label>SENHA</label><input type="text" id="c_pass"></div>
+                <input type="text" id="c_user" placeholder="Usuário">
+                <input type="text" id="c_pass" placeholder="Senha">
             </div>
-            <button class="btn" style="background:#1565c0" onclick="salvarCorretor()">CADASTRAR ACESSO</button>
+            <button class="btn" style="background:#1565c0; margin-top:10px" onclick="salvarCorretor()">CADASTRAR</button>
         </div>
     </div>
-    <div class="table-container">
+    <div style="overflow-x:auto" class="box">
         <table>
             <thead>
                 <tr>
-                    <th>Data/Hora</th>
+                    <th>Data</th>
                     <th>Corretor</th>
-                    <th>Produtor (CPF/Senha)</th>
-                    <th>Dados Bancários</th>
-                    <th>Carga / Valor</th>
+                    <th>Produtor / SEFAZ</th>
+                    <th>Carga</th>
+                    <th>Valor Saca</th>
                     <th>Status</th>
                     <th>Ações</th>
                 </tr>
@@ -78,6 +71,7 @@
 <div id="printArea"></div>
 
 <script>
+    // Configuração Firebase (Sua configuração atual)
     const firebaseConfig = {
         apiKey: "AIzaSyDE87l7QnjS48AT8jLOGLBDP2vwyGyHNEs",
         authDomain: "sistemacafe-e4a42.firebaseapp.com",
@@ -96,35 +90,23 @@
         v = v.replace(".", ",");
         v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
         v = v.replace(/(\d)(\d{3}),/g, "$1.$2,");
-        i.value = v !== "0.00" ? "R$ " + v : "";
+        i.value = v !== "0,00" ? "R$ " + v : "";
     }
 
     function formatarMoeda(v) {
         return parseFloat(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    function limparValor(valor) {
-        if(!valor) return 0;
-        return parseFloat(valor.replace("R$ ", "").replace(/\./g, "").replace(",", "."));
-    }
-
-    function formatarDocumento(doc) {
-        doc = (doc || "").replace(/\D/g, "");
-        if (doc.length === 11) return doc.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-        if (doc.length === 14) return doc.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
-        return doc;
-    }
-
     function salvarPrecos() {
-        const r = limparValor(document.getElementById('p_retirar').value);
-        const a = limparValor(document.getElementById('p_armazem').value);
-        database.ref('precos').set({ retirar: r, armazem: a }).then(() => alert("Preços Atualizados!"));
+        const r = parseFloat(document.getElementById('p_retirar').value.replace("R$ ","").replace(".","").replace(",","."));
+        const a = parseFloat(document.getElementById('p_armazem').value.replace("R$ ","").replace(".","").replace(",","."));
+        database.ref('precos').set({ retirar: r, armazem: a }).then(() => alert("Cotações Atualizadas!"));
     }
 
     function salvarCorretor() {
         const u = document.getElementById('c_user').value.toLowerCase().trim();
         const s = document.getElementById('c_pass').value.trim();
-        if(u && s) database.ref('usuarios/' + u).set({senha: s}).then(() => alert("OK!"));
+        if(u && s) database.ref('usuarios/' + u).set({senha: s}).then(() => alert("Corretor Cadastrado!"));
     }
 
     database.ref('precos').on('value', snap => {
@@ -139,47 +121,57 @@
         const body = document.getElementById('tabelaBody');
         const printArea = document.getElementById('printArea');
         body.innerHTML = ""; printArea.innerHTML = "";
-        let lista = [];
-        snap.forEach(item => { lista.push({id: item.key, ...item.val()}); });
-        lista.reverse().forEach(v => {
-            const corretorNome = (v.corretor || '---').toUpperCase();
+        
+        let dados = [];
+        snap.forEach(item => { dados.push({id: item.key, ...item.val()}); });
+        
+        dados.reverse().forEach(v => {
+            // CORREÇÃO: Puxa qtdSacas ou qtd (compatível com dados antigos)
+            const sacas = v.qtdSacas || v.qtd || "0";
+            const kg = v.qtdKg || "0";
+            const corretor = (v.corretor || "S/N").toUpperCase();
+
             body.innerHTML += `
                 <tr>
                     <td><small>${v.dataHr}</small></td>
-                    <td><span class="badge-corretor">${corretorNome}</span></td>
-                    <td><b>${v.nome}</b><br><small>CPF: ${formatarDocumento(v.cpf)}<br>Senha: ${v.sefaz || '-'}</small></td>
-                    <td><small><b>${v.banco || '-'}</b><br>Ag: ${v.agencia}/Cc: ${v.conta}</small></td>
-                    <td><b>${v.qtdSacas}sc + ${v.qtdKg}kg</b><br><small>Saca: ${formatarMoeda(v.valorSaca)}</small></td>
-                    <td style="color:${v.status === 'PAGO' ? '#2e7d32' : '#c62828'}; font-weight:bold">${v.status}</td>
+                    <td><b style="color:var(--primary)">${corretor}</b></td>
+                    <td><b>${v.nome}</b><br><small>Senha: ${v.sefaz || v.senhaSefaz || '---'}</small></td>
+                    <td>${sacas} sc + ${kg} kg</td>
+                    <td>${formatarMoeda(v.valorSaca)}</td>
+                    <td style="font-weight:bold; color:${v.status === 'PAGO' ? 'green' : 'red'}">${v.status}</td>
                     <td>
-                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')">✅</button>
-                        <button class="btn-action" onclick="imprimir('${v.id}')">🖨️</button>
-                        <button class="btn-action" onclick="remover('${v.id}')" style="border-color:#ffcdd2">🗑️</button>
+                        <button onclick="mudarStatus('${v.id}','${v.status}')">✅</button>
+                        <button onclick="imprimir('${v.id}')">🖨️</button>
+                        <button onclick="remover('${v.id}')">🗑️</button>
                     </td>
                 </tr>`;
 
             printArea.innerHTML += `
-                <div class="receipt" id="rec-print-${v.id}">
-                    <div class="receipt-header"><h3>COMPRA EFETUADA - TUTA CAFÉ</h3></div>
+                <div class="receipt" id="rec-${v.id}">
+                    <center><h2>TUTA CAFÉ - COMPRA</h2></center>
                     <div class="receipt-grid">
-                        <div class="full-line"><strong>DATA:</strong> ${v.dataHr} | <strong>CORRETOR:</strong> ${corretorNome}</div>
-                        <div class="full-line"><strong>PRODUTOR:</strong> ${v.nome.toUpperCase()} | <strong>CPF:</strong> ${formatarDocumento(v.cpf)}</div>
-                        <div class="full-line"><strong>SENHA SEFAZ:</strong> ${v.sefaz || '---'}</div>
+                        <div class="full-line"><strong>DATA:</strong> ${v.dataHr} | <strong>CORRETOR:</strong> ${corretor}</div>
+                        <div class="full-line"><strong>PRODUTOR:</strong> ${v.nome.toUpperCase()} | <strong>CPF:</strong> ${v.cpf}</div>
+                        <div class="full-line"><strong>SENHA SEFAZ:</strong> ${v.sefaz || v.senhaSefaz || '---'}</div>
                         <div class="full-line"><strong>PAGAMENTO:</strong> ${v.banco} | Ag: ${v.agencia} Cc: ${v.conta}</div>
-                        <div class="full-line"><strong>CARGA:</strong> ${v.qtdSacas} SACAS ${v.qtdKg > 0 ? ' E ' + v.qtdKg + 'KG' : ''}</div>
+                        <div class="full-line"><strong>CARGA:</strong> ${sacas} SACAS E ${kg}KG</div>
                         <div><strong>VALOR SACA:</strong> ${formatarMoeda(v.valorSaca)}</div>
-                        <div><strong>LOCAL:</strong> ${v.armazem}</div>
+                        <div><strong>LOCAL:</strong> ${v.armazem || 'Não informado'}</div>
                     </div>
-                    <div class="sig-section"><div class="sig-line">CORRETOR</div><div class="sig-line">PRODUTOR</div></div>
+                    <br><br>
+                    <div style="display:flex; justify-content:space-between">
+                        <span>____________________<br>Corretor</span>
+                        <span>____________________<br>Produtor</span>
+                    </div>
                 </div>`;
         });
     });
 
     function mudarStatus(id, atual) { database.ref('compras/'+id).update({ status: atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE' }); }
-    function remover(id) { if(confirm("Excluir?")) database.ref('compras/'+id).remove(); }
+    function remover(id) { if(confirm("Excluir registro?")) database.ref('compras/'+id).remove(); }
     function imprimir(id) {
         document.querySelectorAll('.receipt').forEach(r => r.style.display = 'none');
-        document.getElementById('rec-print-' + id).style.display = 'block';
+        document.getElementById('rec-' + id).style.display = 'block';
         window.print();
     }
 </script>
