@@ -9,29 +9,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #3e2723; --accent: #8d6e63; --bg: #f4f4f4; --success: #2e7d32; --danger: #c62828; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; }
-        header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; color: #333; }
+        
+        header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { margin: 0; font-size: 20px; letter-spacing: 1px; }
+
         .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #ddd; }
+        .box h2 { font-size: 14px; margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 8px; text-transform: uppercase; }
+
         .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         label { display: block; font-size: 10px; font-weight: bold; color: var(--accent); margin-bottom: 3px; }
         input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; }
+        
         .btn { background: var(--success); color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .table-container { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { text-align: left; background: #fafafa; padding: 12px; border-bottom: 2px solid #eee; font-size: 11px; color: #777; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        .badge-corretor { background: #e3f2fd; color: #1565c0; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; }
+        
+        .table-container { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { text-align: left; background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; font-size: 11px; color: #555; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; }
+
+        .badge-corretor { background: #efebe9; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
         .btn-action { padding: 6px 10px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 16px; margin-right: 5px; }
 
+        /* ÁREA DE IMPRESSÃO - CORREÇÃO DE VISIBILIDADE */
+        #printArea { display: none; }
+
         @media print {
+            body { background: white; padding: 0; }
             .no-print { display: none !important; }
             #printArea { display: block !important; width: 100%; }
-            .receipt { border: 1px solid #000; padding: 15px; margin: 0 auto; width: 95%; font-family: Arial, sans-serif; font-size: 11px; page-break-after: always; }
-            .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-            .full-row { grid-column: span 2; border-top: 1px dotted #888; padding-top: 3px; }
-            .sig-area { display: flex; justify-content: space-between; margin-top: 35px; }
-            .sig-box { border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 4px; font-size: 9px; }
+            
+            .receipt { 
+                border: 2px solid #000; padding: 20px; margin: 10px auto; width: 95%;
+                font-family: 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.5; color: #000;
+                page-break-after: always;
+            }
+            .receipt-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px; }
+            .receipt-header h3 { margin: 0; font-size: 18px; }
+            .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+            .full-line { grid-column: span 2; border-bottom: 1px dotted #000; padding: 4px 0; }
+            .sig-section { display: flex; justify-content: space-between; margin-top: 50px; }
+            .sig-line { border-top: 1px solid #000; width: 45%; text-align: center; padding-top: 5px; font-weight: bold; }
         }
     </style>
 </head>
@@ -39,22 +58,24 @@
 
 <div class="no-print">
     <header><h1>TUTA CAFÉ - ADMINISTRATIVO</h1></header>
+
     <div class="grid-top">
         <div class="box">
             <h2>Cotações (200/250 Def.)</h2>
             <div class="input-group">
-                <div><label>A RETIRAR</label><input type="number" id="p_retirar" step="0.01"></div>
-                <div><label>POSTO ARMAZÉM</label><input type="number" id="p_armazem" step="0.01"></div>
+                <div><label>A RETIRAR (R$)</label><input type="number" id="p_retirar" step="0.01"></div>
+                <div><label>POSTO ARMAZÉM (R$)</label><input type="number" id="p_armazem" step="0.01"></div>
             </div>
-            <button class="btn" onclick="salvarPrecos()">ATUALIZAR COTAÇÕES</button>
+            <button class="btn" onclick="salvarPrecos()">ATUALIZAR PREÇOS</button>
         </div>
+
         <div class="box">
-            <h2>Novo Corretor</h2>
+            <h2>Gestão de Corretores</h2>
             <div class="input-group">
                 <div><label>USUÁRIO</label><input type="text" id="c_user"></div>
                 <div><label>SENHA</label><input type="text" id="c_pass"></div>
             </div>
-            <button class="btn" style="background:#1565c0" onclick="salvarCorretor()">CADASTRAR</button>
+            <button class="btn" style="background:#1565c0" onclick="salvarCorretor()">CADASTRAR ACESSO</button>
         </div>
     </div>
 
@@ -62,11 +83,11 @@
         <table>
             <thead>
                 <tr>
-                    <th>Data</th>
+                    <th>Data/Hora</th>
                     <th>Corretor</th>
-                    <th>Produtor / SEFAZ</th>
-                    <th>Pagamento</th>
-                    <th>Carga (Sacas+Kg)</th>
+                    <th>Produtor (CPF/Senha)</th>
+                    <th>Dados Bancários</th>
+                    <th>Carga / Valor</th>
                     <th>Status</th>
                     <th>Ações</th>
                 </tr>
@@ -75,6 +96,7 @@
         </table>
     </div>
 </div>
+
 <div id="printArea"></div>
 
 <script>
@@ -90,6 +112,17 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    // Formatação de CPF/CNPJ
+    function formatarDocumento(doc) {
+        doc = doc.replace(/\D/g, "");
+        if (doc.length === 11) {
+            return doc.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+        } else if (doc.length === 14) {
+            return doc.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+        }
+        return doc;
+    }
+
     function salvarPrecos() {
         database.ref('precos').set({
             retirar: document.getElementById('p_retirar').value,
@@ -100,7 +133,12 @@
     function salvarCorretor() {
         const u = document.getElementById('c_user').value.toLowerCase().trim();
         const s = document.getElementById('c_pass').value.trim();
-        if(u && s) database.ref('usuarios/' + u).set({senha: s}).then(() => alert("OK!"));
+        if(u && s) {
+            database.ref('usuarios/' + u).set({senha: s}).then(() => {
+                alert("Acesso Criado!");
+                document.getElementById('c_user').value = ""; document.getElementById('c_pass').value = "";
+            });
+        }
     }
 
     database.ref('precos').on('value', snap => {
@@ -120,44 +158,69 @@
         snap.forEach(item => { lista.push({id: item.key, ...item.val()}); });
 
         lista.reverse().forEach(v => {
-            // LÓGICA DE COMPATIBILIDADE: Se qtdSacas não existir, usa a qtd antiga
-            const sacas = v.qtdSacas || v.qtd || "0";
-            const quilos = v.qtdKg || "0";
-            const pesoTexto = quilos > 0 ? `${sacas} sc + ${quilos}kg` : `${sacas} sc`;
-            
+            const corretorNome = (v.corretor || '---').toUpperCase();
+            const documento = formatarDocumento(v.cpf || "");
             const valorF = v.valorSaca ? "R$ " + parseFloat(v.valorSaca).toLocaleString('pt-BR') : "---";
-            const stClass = v.status === 'PAGO' ? 'color:#2e7d32' : 'color:#c62828';
+            const sacas = v.qtdSacas || v.qtd || "0";
+            const kg = v.qtdKg || "0";
+            const corStatus = v.status === 'PAGO' ? 'var(--success)' : 'var(--danger)';
 
+            // Linha da Tabela
             body.innerHTML += `
                 <tr>
                     <td><small>${v.dataHr}</small></td>
-                    <td><span class="badge-corretor">${v.corretor || '---'}</span></td>
-                    <td><b>${v.nome}</b><br><small>Senha: ${v.sefaz || '-'}</small></td>
-                    <td><small>${v.banco || '-'}<br>Ag: ${v.agencia} / Cc: ${v.conta}</small></td>
-                    <td><b>${pesoTexto}</b><br><small>Saca: ${valorF}</small></td>
-                    <td style="${stClass}; font-weight:bold">${v.status}</td>
+                    <td><span class="badge-corretor">${corretorNome}</span></td>
                     <td>
-                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')">✅</button>
-                        <button class="btn-action" onclick="imprimir('${v.id}')">🖨️</button>
-                        <button class="btn-action" onclick="remover('${v.id}')" style="border-color:#ffcdd2">🗑️</button>
+                        <b>${v.nome}</b><br>
+                        <small>CPF: ${documento}<br>Senha: ${v.sefaz || '-'}</small>
+                    </td>
+                    <td>
+                        <small><b>${v.banco || '-'}</b><br>Ag: ${v.agencia || '-'} / Cc: ${v.conta || '-'}</small>
+                    </td>
+                    <td>
+                        <b>${sacas} sc ${kg > 0 ? '+ ' + kg + 'kg' : ''}</b><br>
+                        <small>Saca: ${valorF}</small>
+                    </td>
+                    <td style="color:${corStatus}; font-weight:bold">${v.status}</td>
+                    <td>
+                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')" title="Alterar Status">✅</button>
+                        <button class="btn-action" onclick="imprimir('${v.id}')" title="Imprimir Recibo">🖨️</button>
+                        <button class="btn-action" onclick="remover('${v.id}')" style="border-color:#ffcdd2" title="Excluir">🗑️</button>
                     </td>
                 </tr>
             `;
 
+            // Estrutura do Recibo (Invisível na tela adm)
             printArea.innerHTML += `
                 <div class="receipt" id="rec-print-${v.id}">
-                    <h3 style="text-align:center">COMPRA EFETUADA - TUTA CAFÉ</h3>
-                    <div class="receipt-grid">
-                        <div><strong>Data:</strong> ${v.dataHr}</div>
-                        <div><strong>Corretor:</strong> ${v.corretor || '-'}</div>
-                        <div class="full-row"><strong>Produtor:</strong> ${v.nome} | ${v.cpf}</div>
-                        <div><strong>Sefaz:</strong> ${v.sefaz || '-'}</div>
-                        <div class="full-row"><strong>Pagamento:</strong> ${v.banco} | Ag: ${v.agencia} Cc: ${v.conta}</div>
-                        <div class="full-row"><strong>Carga:</strong> ${sacas} Sacas ${quilos > 0 ? ' e ' + quilos + 'kg' : ''} - ${v.tipoCafe}</div>
-                        <div><strong>Vlr Saca:</strong> ${valorF}</div>
-                        <div><strong>Local:</strong> ${v.armazem}</div>
+                    <div class="receipt-header">
+                        <h3>COMPRA EFETUADA - TUTA CAFÉ</h3>
                     </div>
-                    <div class="sig-area"><div class="sig-box">Corretor</div><div class="sig-box">Produtor</div></div>
+                    <div class="receipt-grid">
+                        <div><strong>DATA:</strong> ${v.dataHr}</div>
+                        <div style="text-align:right"><strong>CORRETOR:</strong> ${corretorNome}</div>
+                        
+                        <div class="full-line"><strong>PRODUTOR:</strong> ${v.nome.toUpperCase()}</div>
+                        <div><strong>CPF/CNPJ:</strong> ${documento}</div>
+                        <div><strong>SENHA SEFAZ:</strong> ${v.sefaz || '---'}</div>
+                        
+                        <div class="full-line"><strong>PAGAMENTO:</strong> ${v.banco}</div>
+                        <div><strong>AGÊNCIA:</strong> ${v.agencia}</div>
+                        <div><strong>CONTA:</strong> ${v.conta}</div>
+                        
+                        <div class="full-line"><strong>CARGA:</strong> ${sacas} SACAS ${kg > 0 ? 'E ' + kg + 'KG' : ''}</div>
+                        <div><strong>CLASSIFICAÇÃO:</strong> ${v.tipoCafe}</div>
+                        <div><strong>VALOR SACA:</strong> ${valorF}</div>
+                        
+                        <div class="full-line"><strong>LOCAL/ARMAZÉM:</strong> ${v.armazem}</div>
+                        <div class="full-line"><strong>OBS:</strong> ${v.observacao || 'NENHUMA'}</div>
+                    </div>
+                    
+                    <div class="sig-section">
+                        <div class="sig-line">ASS. CORRETOR</div>
+                        <div class="sig-line">ASS. PRODUTOR</div>
+                    </div>
+                    <div style="text-align:center; margin-top:20px; font-size:10px;">*** Recibo Gerado pelo Sistema Tuta Café ***</div>
                 </div>
             `;
         });
@@ -166,14 +229,21 @@
     function mudarStatus(id, atual) {
         database.ref('compras/'+id).update({ status: atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE' });
     }
+
     function remover(id) {
-        if(confirm("Excluir definitivamente?")) database.ref('compras/'+id).remove();
+        if(confirm("Deseja apagar permanentemente este registro?")) {
+            database.ref('compras/'+id).remove();
+        }
     }
+
     function imprimir(id) {
         const todos = document.querySelectorAll('.receipt');
         todos.forEach(r => r.style.display = 'none');
-        document.getElementById('rec-print-' + id).style.display = 'block';
-        window.print();
+        const alvo = document.getElementById('rec-print-' + id);
+        if(alvo) {
+            alvo.style.display = 'block';
+            window.print();
+        }
     }
 </script>
 </body>
