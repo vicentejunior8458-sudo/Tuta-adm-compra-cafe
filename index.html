@@ -2,64 +2,98 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Painel ADM | Tuta Café</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo | Tuta Café</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #3e2723; --accent: #8d6e63; --bg: #f4f4f4; --success: #2e7d32; --danger: #c62828; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; color: #333; }
-        header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #ddd; }
-        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .btn { background: var(--success); color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; background: white; }
-        th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
+        :root { --primary: #2d1b18; --secondary: #5d4037; --accent: #c62828; --bg: #f0f2f5; --white: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: #333; }
         
+        .header-adm { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .header-adm h1 { margin: 0; font-size: 24px; letter-spacing: 2px; }
+
+        .top-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid var(--secondary); }
+        .card h2 { font-size: 16px; color: var(--primary); margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; text-transform: uppercase; }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 5px rgba(93,64,55,0.2); }
+
+        .btn { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: 0.3s; padding: 12px; }
+        .btn-save { background: var(--secondary); color: white; width: 100%; margin-top: 10px; }
+        .btn-save:hover { background: var(--primary); }
+
+        .table-resizer { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 12px; color: #777; text-transform: uppercase; border-bottom: 2px solid #eee; }
+        td { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 13px; }
+        tr:hover { background: #fcfcfc; }
+
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .pago { background: #e8f5e9; color: #2e7d32; }
+        .pendente { background: #ffebee; color: #c62828; }
+
+        .action-icon { background: none; border: none; font-size: 18px; cursor: pointer; margin-right: 8px; opacity: 0.7; transition: 0.2s; }
+        .action-icon:hover { opacity: 1; transform: scale(1.1); }
+
         #printArea { display: none; }
         @media print {
             .no-print { display: none !important; }
-            #printArea { display: block !important; width: 100%; }
-            .receipt { border: 2px solid #000; padding: 20px; margin: 10px auto; font-family: monospace; page-break-after: always; }
-            .receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-            .full-line { grid-column: span 2; border-bottom: 1px dotted #000; padding: 5px 0; }
+            #printArea { display: block !important; }
+            .receipt-box { border: 2px solid #333; padding: 30px; width: 18cm; margin: 20px auto; font-family: sans-serif; position: relative; }
+            .receipt-header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+            .receipt-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
+            .footer-sig { margin-top: 60px; display: flex; justify-content: space-between; }
+            .sig-line { border-top: 1px solid #333; width: 200px; text-align: center; font-size: 12px; padding-top: 5px; }
         }
     </style>
 </head>
 <body>
 
 <div class="no-print">
-    <header><h1>TUTA CAFÉ - ADMINISTRATIVO</h1></header>
-    <div class="grid-top">
-        <div class="box">
-            <h2>Cotações</h2>
-            <div class="input-group">
-                <div><label>A RETIRAR</label><input type="text" id="p_retirar" oninput="mascaraMoeda(this)"></div>
-                <div><label>POSTO ARMAZÉM</label><input type="text" id="p_armazem" oninput="mascaraMoeda(this)"></div>
+    <header class="header-adm">
+        <h1>TUTA CAFÉ - GESTÃO ADMINISTRATIVA</h1>
+    </header>
+
+    <div class="top-grid">
+        <div class="card">
+            <h2>Cotação do Dia (Rondônia)</h2>
+            <div style="display: flex; gap: 10px;">
+                <div class="input-group" style="flex:1">
+                    <label>A RETIRAR</label>
+                    <input type="text" id="p_retirar" oninput="mascaraMoeda(this)" placeholder="R$ 0,00">
+                </div>
+                <div class="input-group" style="flex:1">
+                    <label>POSTO ARMAZÉM</label>
+                    <input type="text" id="p_armazem" oninput="mascaraMoeda(this)" placeholder="R$ 0,00">
+                </div>
             </div>
-            <button class="btn" style="margin-top:10px" onclick="salvarPrecos()">ATUALIZAR PREÇOS</button>
+            <button class="btn btn-save" onclick="salvarPrecos()">ATUALIZAR MERCADO</button>
         </div>
-        <div class="box">
-            <h2>Novo Corretor</h2>
-            <div class="input-group">
-                <input type="text" id="c_user" placeholder="Usuário">
+
+        <div class="card">
+            <h2>Acessos Corretores</h2>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="c_user" placeholder="Login">
                 <input type="text" id="c_pass" placeholder="Senha">
             </div>
-            <button class="btn" style="background:#1565c0; margin-top:10px" onclick="salvarCorretor()">CADASTRAR</button>
+            <button class="btn btn-save" style="background: #1976d2;" onclick="salvarCorretor()">LIBERAR ACESSO</button>
         </div>
     </div>
-    <div style="overflow-x:auto" class="box">
+
+    <div class="table-resizer">
         <table>
             <thead>
                 <tr>
-                    <th>Data</th>
+                    <th>Data/Hora</th>
                     <th>Corretor</th>
-                    <th>Produtor / SEFAZ</th>
-                    <th>Carga</th>
-                    <th>Valor Saca</th>
+                    <th>Produtor / Documentos</th>
+                    <th>Carga Detalhada</th>
+                    <th>Financeiro</th>
                     <th>Status</th>
                     <th>Ações</th>
                 </tr>
@@ -68,10 +102,10 @@
         </table>
     </div>
 </div>
+
 <div id="printArea"></div>
 
 <script>
-    // Configuração Firebase (Sua configuração atual)
     const firebaseConfig = {
         apiKey: "AIzaSyDE87l7QnjS48AT8jLOGLBDP2vwyGyHNEs",
         authDomain: "sistemacafe-e4a42.firebaseapp.com",
@@ -98,15 +132,15 @@
     }
 
     function salvarPrecos() {
-        const r = parseFloat(document.getElementById('p_retirar').value.replace("R$ ","").replace(".","").replace(",","."));
-        const a = parseFloat(document.getElementById('p_armazem').value.replace("R$ ","").replace(".","").replace(",","."));
-        database.ref('precos').set({ retirar: r, armazem: a }).then(() => alert("Cotações Atualizadas!"));
+        const r = parseFloat(document.getElementById('p_retirar').value.replace(/\D/g,'')) / 100;
+        const a = parseFloat(document.getElementById('p_armazem').value.replace(/\D/g,'')) / 100;
+        database.ref('precos').set({ retirar: r, armazem: a }).then(() => alert("Cotações atualizadas no sistema!"));
     }
 
     function salvarCorretor() {
         const u = document.getElementById('c_user').value.toLowerCase().trim();
         const s = document.getElementById('c_pass').value.trim();
-        if(u && s) database.ref('usuarios/' + u).set({senha: s}).then(() => alert("Corretor Cadastrado!"));
+        if(u && s) database.ref('usuarios/' + u).set({senha: s}).then(() => alert("Acesso de corretor ativo!"));
     }
 
     database.ref('precos').on('value', snap => {
@@ -121,57 +155,56 @@
         const body = document.getElementById('tabelaBody');
         const printArea = document.getElementById('printArea');
         body.innerHTML = ""; printArea.innerHTML = "";
+        let lista = [];
+        snap.forEach(item => { lista.push({id: item.key, ...item.val()}); });
         
-        let dados = [];
-        snap.forEach(item => { dados.push({id: item.key, ...item.val()}); });
-        
-        dados.reverse().forEach(v => {
-            // CORREÇÃO: Puxa qtdSacas ou qtd (compatível com dados antigos)
-            const sacas = v.qtdSacas || v.qtd || "0";
-            const kg = v.qtdKg || "0";
-            const corretor = (v.corretor || "S/N").toUpperCase();
+        lista.reverse().forEach(v => {
+            const sacas = v.qtdSacas || v.qtd || 0;
+            const kg = v.qtdKg || 0;
+            const sefaz = v.sefaz || v.senhaSefaz || '---';
 
             body.innerHTML += `
                 <tr>
                     <td><small>${v.dataHr}</small></td>
-                    <td><b style="color:var(--primary)">${corretor}</b></td>
-                    <td><b>${v.nome}</b><br><small>Senha: ${v.sefaz || v.senhaSefaz || '---'}</small></td>
-                    <td>${sacas} sc + ${kg} kg</td>
-                    <td>${formatarMoeda(v.valorSaca)}</td>
-                    <td style="font-weight:bold; color:${v.status === 'PAGO' ? 'green' : 'red'}">${v.status}</td>
+                    <td><strong style="color:var(--secondary)">${v.corretor.toUpperCase()}</strong></td>
+                    <td><b>${v.nome}</b><br><small>CPF: ${v.cpf} | Sefaz: ${sefaz}</small></td>
+                    <td>${sacas}sc + ${kg}kg<br><small>${v.armazem}</small></td>
+                    <td><strong>${formatarMoeda(v.valorSaca)}</strong><br><small>por saca</small></td>
+                    <td><span class="status-badge ${v.status === 'PAGO' ? 'pago' : 'pendente'}">${v.status}</span></td>
                     <td>
-                        <button onclick="mudarStatus('${v.id}','${v.status}')">✅</button>
-                        <button onclick="imprimir('${v.id}')">🖨️</button>
-                        <button onclick="remover('${v.id}')">🗑️</button>
+                        <button class="action-icon" title="Mudar Status" onclick="mudarStatus('${v.id}','${v.status}')">🔄</button>
+                        <button class="action-icon" title="Imprimir" onclick="imprimir('${v.id}')">🖨️</button>
+                        <button class="action-icon" title="Excluir" onclick="remover('${v.id}')">🗑️</button>
                     </td>
                 </tr>`;
 
             printArea.innerHTML += `
-                <div class="receipt" id="rec-${v.id}">
-                    <center><h2>TUTA CAFÉ - COMPRA</h2></center>
-                    <div class="receipt-grid">
-                        <div class="full-line"><strong>DATA:</strong> ${v.dataHr} | <strong>CORRETOR:</strong> ${corretor}</div>
-                        <div class="full-line"><strong>PRODUTOR:</strong> ${v.nome.toUpperCase()} | <strong>CPF:</strong> ${v.cpf}</div>
-                        <div class="full-line"><strong>SENHA SEFAZ:</strong> ${v.sefaz || v.senhaSefaz || '---'}</div>
-                        <div class="full-line"><strong>PAGAMENTO:</strong> ${v.banco} | Ag: ${v.agencia} Cc: ${v.conta}</div>
-                        <div class="full-line"><strong>CARGA:</strong> ${sacas} SACAS E ${kg}KG</div>
-                        <div><strong>VALOR SACA:</strong> ${formatarMoeda(v.valorSaca)}</div>
-                        <div><strong>LOCAL:</strong> ${v.armazem || 'Não informado'}</div>
+                <div class="receipt-box" id="print-${v.id}">
+                    <div class="receipt-header">
+                        <h2>COMPROVANTE DE COMPRA - TUTA CAFÉ</h2>
+                        <p>Registro Eletrônico: ${v.id}</p>
                     </div>
-                    <br><br>
-                    <div style="display:flex; justify-content:space-between">
-                        <span>____________________<br>Corretor</span>
-                        <span>____________________<br>Produtor</span>
+                    <div class="receipt-row"><span>PRODUTOR:</span> <strong>${v.nome.toUpperCase()}</strong></div>
+                    <div class="receipt-row"><span>CPF/CNPJ:</span> <strong>${v.cpf}</strong></div>
+                    <div class="receipt-row"><span>SENHA SEFAZ:</span> <strong>${sefaz}</strong></div>
+                    <div class="receipt-row"><span>BANCO:</span> <strong>${v.banco} | AG: ${v.agencia} CC: ${v.conta}</strong></div>
+                    <div class="receipt-row"><span>CARGA:</span> <strong>${sacas} SACAS E ${kg} KG</strong></div>
+                    <div class="receipt-row"><span>VALOR ACORDADO:</span> <strong>${formatarMoeda(v.valorSaca)} / saca</strong></div>
+                    <div class="receipt-row"><span>LOCAL:</span> <strong>${v.armazem}</strong></div>
+                    <div class="receipt-row"><span>DATA/HORA:</span> <strong>${v.dataHr}</strong></div>
+                    <div class="footer-sig">
+                        <div class="sig-line">ASSINATURA CORRETOR</div>
+                        <div class="sig-line">ASSINATURA PRODUTOR</div>
                     </div>
                 </div>`;
         });
     });
 
     function mudarStatus(id, atual) { database.ref('compras/'+id).update({ status: atual === 'PENDENTE' ? 'PAGO' : 'PENDENTE' }); }
-    function remover(id) { if(confirm("Excluir registro?")) database.ref('compras/'+id).remove(); }
+    function remover(id) { if(confirm("Deseja realmente excluir este registro permanentemente?")) database.ref('compras/'+id).remove(); }
     function imprimir(id) {
-        document.querySelectorAll('.receipt').forEach(r => r.style.display = 'none');
-        document.getElementById('rec-' + id).style.display = 'block';
+        document.querySelectorAll('.receipt-box').forEach(r => r.style.display = 'none');
+        document.getElementById('print-' + id).style.display = 'block';
         window.print();
     }
 </script>
