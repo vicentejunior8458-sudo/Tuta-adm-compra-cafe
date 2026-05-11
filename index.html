@@ -44,10 +44,10 @@
     <header><h1>TUTA CAFÉ - ADMINISTRATIVO</h1></header>
     <div class="grid-top">
         <div class="box">
-            <h2>Cotações (Centavos OK)</h2>
+            <h2>Cotações</h2>
             <div class="input-group">
-                <div><label>A RETIRAR (R$)</label><input type="number" id="p_retirar" step="0.01"></div>
-                <div><label>POSTO ARMAZÉM (R$)</label><input type="number" id="p_armazem" step="0.01"></div>
+                <div><label>A RETIRAR</label><input type="text" id="p_retirar" oninput="mascaraMoeda(this)" placeholder="R$ 0,00"></div>
+                <div><label>POSTO ARMAZÉM</label><input type="text" id="p_armazem" oninput="mascaraMoeda(this)" placeholder="R$ 0,00"></div>
             </div>
             <button class="btn" onclick="salvarPrecos()">ATUALIZAR PREÇOS</button>
         </div>
@@ -92,20 +92,34 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    // Máscara de Moeda Dinâmica
+    function mascaraMoeda(i) {
+        let v = i.value.replace(/\D/g,'');
+        v = (v/100).toFixed(2) + '';
+        v = v.replace(".", ",");
+        v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
+        v = v.replace(/(\d)(\d{3}),/g, "$1.$2,");
+        i.value = v !== "0.00" ? "R$ " + v : "";
+    }
+
     function formatarMoeda(v) {
         return parseFloat(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
+    function limparValor(valor) {
+        return parseFloat(valor.replace("R$ ", "").replace(/\./g, "").replace(",", "."));
+    }
+
     function formatarDocumento(doc) {
-        doc = doc.replace(/\D/g, "");
+        doc = (doc || "").replace(/\D/g, "");
         if (doc.length === 11) return doc.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
         if (doc.length === 14) return doc.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
         return doc;
     }
 
     function salvarPrecos() {
-        const r = document.getElementById('p_retirar').value;
-        const a = document.getElementById('p_armazem').value;
+        const r = limparValor(document.getElementById('p_retirar').value);
+        const a = limparValor(document.getElementById('p_armazem').value);
         database.ref('precos').set({ retirar: r, armazem: a }).then(() => alert("Preços Atualizados!"));
     }
 
@@ -118,8 +132,8 @@
     database.ref('precos').on('value', snap => {
         const p = snap.val();
         if(p){
-            document.getElementById('p_retirar').value = p.retirar || "";
-            document.getElementById('p_armazem').value = p.armazem || "";
+            document.getElementById('p_retirar').value = formatarMoeda(p.retirar);
+            document.getElementById('p_armazem').value = formatarMoeda(p.armazem);
         }
     });
 
