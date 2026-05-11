@@ -12,38 +12,38 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; }
         
         header { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        h1 { margin: 0; font-size: 20px; }
+        h1 { margin: 0; font-size: 20px; letter-spacing: 1px; }
 
         .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .box h2 { font-size: 14px; margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .box h2 { font-size: 14px; margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 8px; text-transform: uppercase; }
 
-        .input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         label { display: block; font-size: 10px; font-weight: bold; color: var(--accent); margin-bottom: 3px; }
-        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; }
         
-        .btn { background: var(--success); color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn { background: var(--success); color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .btn-blue { background: #1565c0; }
 
         .table-container { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { text-align: left; background: #fafafa; padding: 10px; border-bottom: 2px solid #eee; font-size: 11px; color: #777; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
+        th { text-align: left; background: #fafafa; padding: 12px; border-bottom: 2px solid #eee; font-size: 11px; color: #777; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
 
         .badge-corretor { background: #e3f2fd; color: #1565c0; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; }
         .status-pago { color: var(--success); font-weight: bold; }
         .status-pendente { color: var(--danger); font-weight: bold; }
         
-        .btn-action { padding: 5px 8px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 14px; margin-right: 3px; transition: 0.2s; }
-        .btn-action:hover { background: #f0f0f0; border-color: #bbb; }
+        .btn-action { padding: 6px 10px; border-radius: 5px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 16px; margin-right: 5px; transition: 0.2s; }
+        .btn-action:hover { background: #f0f0f0; }
 
-        /* ESTILO DE IMPRESSÃO COMPACTO */
+        /* ESTILO DE IMPRESSÃO COMPACTO (PADRÃO ANTERIOR) */
         #printArea { display: none; }
         @media print {
             .no-print { display: none !important; }
             #printArea { display: block !important; width: 100%; }
             .receipt { 
-                border: 1px solid #000; padding: 15px; margin: 0 auto; width: 90%;
+                border: 1px solid #000; padding: 15px; margin: 0 auto; width: 95%;
                 font-family: Arial, sans-serif; font-size: 11px; line-height: 1.4; color: #000;
                 page-break-after: always;
             }
@@ -62,18 +62,17 @@
 
     <div class="grid-top">
         <div class="box">
-            <h2>Cotação do Dia</h2>
+            <h2>Cotações (200/250 Def.)</h2>
             <div class="input-group">
-                <div><label>NOVO 200</label><input type="number" id="p_novo"></div>
-                <div><label>VELHO 200</label><input type="number" id="p_velho"></div>
-                <div><label>ATÉ 300</label><input type="number" id="p_300"></div>
+                <div><label>A RETIRAR (R$)</label><input type="number" id="p_retirar" step="0.01"></div>
+                <div><label>POSTO ARMAZÉM (R$)</label><input type="number" id="p_armazem" step="0.01"></div>
             </div>
-            <button class="btn" onclick="salvarPrecos()">ATUALIZAR PREÇOS</button>
+            <button class="btn" onclick="salvarPrecos()">ATUALIZAR COTAÇÕES</button>
         </div>
 
         <div class="box">
             <h2>Novo Corretor</h2>
-            <div class="input-group" style="grid-template-columns: 1fr 1fr;">
+            <div class="input-group">
                 <div><label>USUÁRIO</label><input type="text" id="c_user"></div>
                 <div><label>SENHA</label><input type="text" id="c_pass"></div>
             </div>
@@ -87,9 +86,9 @@
                 <tr>
                     <th>Data</th>
                     <th>Corretor</th>
-                    <th>Produtor</th>
+                    <th>Produtor / SEFAZ</th>
                     <th>Pagamento</th>
-                    <th>Carga</th>
+                    <th>Carga (Sacas+Kg)</th>
                     <th>Status</th>
                     <th>Ações</th>
                 </tr>
@@ -114,34 +113,36 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    // Salvar Cotações Reformuladas
     function salvarPrecos() {
         database.ref('precos').set({
-            novo200: document.getElementById('p_novo').value,
-            velho200: document.getElementById('p_velho').value,
-            def300: document.getElementById('p_300').value
-        }).then(() => alert("Cotações Atualizadas!"));
+            retirar: document.getElementById('p_retirar').value,
+            armazem: document.getElementById('p_armazem').value
+        }).then(() => alert("Cotações Atualizadas com Sucesso!"));
     }
 
+    // Cadastro de Corretor
     function salvarCorretor() {
         const u = document.getElementById('c_user').value.toLowerCase().trim();
         const s = document.getElementById('c_pass').value.trim();
         if(u && s) {
             database.ref('usuarios/' + u).set({senha: s}).then(() => {
-                alert("Acesso Criado!");
+                alert("Corretor cadastrado!");
                 document.getElementById('c_user').value = ""; document.getElementById('c_pass').value = "";
             });
         }
     }
 
+    // Carregar Cotações nos campos
     database.ref('precos').on('value', snap => {
         const p = snap.val();
         if(p){
-            document.getElementById('p_novo').value = p.novo200;
-            document.getElementById('p_velho').value = p.velho200;
-            document.getElementById('p_300').value = p.def300;
+            document.getElementById('p_retirar').value = p.retirar || "";
+            document.getElementById('p_armazem').value = p.armazem || "";
         }
     });
 
+    // Carregar Tabela e Recibos Compactos
     database.ref('compras').on('value', snap => {
         const body = document.getElementById('tabelaBody');
         const printArea = document.getElementById('printArea');
@@ -153,23 +154,26 @@
         lista.reverse().forEach(v => {
             const stClass = v.status === 'PAGO' ? 'status-pago' : 'status-pendente';
             const valorF = v.valorSaca ? "R$ " + parseFloat(v.valorSaca).toLocaleString('pt-BR') : "---";
+            const pesoFull = `${v.qtdSacas} sc ${v.qtdKg > 0 ? '+ ' + v.qtdKg + 'kg' : ''}`;
 
+            // Linha da Tabela ADM
             body.innerHTML += `
                 <tr>
                     <td><small>${v.dataHr}</small></td>
                     <td><span class="badge-corretor">${v.corretor || '---'}</span></td>
-                    <td><b>${v.nome}</b><br><small>${v.cpf}</small></td>
-                    <td><small>${v.banco}<br>Ag: ${v.agencia} / Cc: ${v.conta}</small></td>
-                    <td><b>${v.qtd} ${v.unidade}</b><br><small>${valorF}</small></td>
+                    <td><b>${v.nome}</b><br><small>CPF: ${v.cpf}<br>Senha: ${v.sefaz}</small></td>
+                    <td><small><b>${v.banco}</b><br>Ag: ${v.agencia} / Cc: ${v.conta}</small></td>
+                    <td><b>${pesoFull}</b><br><small>Saca: ${valorF}</small></td>
                     <td><span class="${stClass}">${v.status}</span></td>
                     <td>
-                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')" title="Alterar Status">✅</button>
-                        <button class="btn-action" onclick="imprimir('${v.id}')" title="Imprimir Recibo">🖨️</button>
+                        <button class="btn-action" onclick="mudarStatus('${v.id}','${v.status}')" title="Mudar Status">✅</button>
+                        <button class="btn-action" onclick="imprimir('${v.id}')" title="Imprimir Comprovante">🖨️</button>
                         <button class="btn-action" onclick="remover('${v.id}')" title="Excluir" style="border-color:#ffcdd2">🗑️</button>
                     </td>
                 </tr>
             `;
 
+            // Recibo Compacto Reformulado (Compra Efetuada)
             printArea.innerHTML += `
                 <div class="receipt" id="rec-print-${v.id}">
                     <h3>COMPRA EFETUADA - TUTA CAFÉ</h3>
@@ -180,18 +184,20 @@
                         <div><strong>CPF/CNPJ:</strong> ${v.cpf}</div>
                         <div><strong>Sefaz:</strong> ${v.sefaz}</div>
                         <div class="full-row"><strong>Banco:</strong> ${v.banco}</div>
-                        <div><strong>Ag:</strong> ${v.agencia}</div>
+                        <div><strong>Agência:</strong> ${v.agencia}</div>
                         <div><strong>Conta:</strong> ${v.conta}</div>
-                        <div class="full-row"><strong>Classif:</strong> ${v.tipoCafe}</div>
-                        <div><strong>Qtd:</strong> ${v.qtd} ${v.unidade}</div>
-                        <div><strong>Vlr Saca:</strong> ${valorF}</div>
-                        <div class="full-row"><strong>Local:</strong> ${v.armazem}</div>
-                        <div class="full-row" style="font-size:9px"><strong>OBS:</strong> ${v.observacao || 'Nenhuma'}</div>
+                        <div class="full-row"><strong>Classificação:</strong> ${v.tipoCafe}</div>
+                        <div><strong>Quantidade:</strong> ${v.qtdSacas} Sacas</div>
+                        <div><strong>Peso Extra:</strong> ${v.qtdKg} Kg</div>
+                        <div><strong>Valor Saca:</strong> ${valorF}</div>
+                        <div><strong>Armazém:</strong> ${v.armazem}</div>
+                        <div class="full-row" style="font-size:9px"><strong>OBS:</strong> ${v.observacao || 'Sem observações.'}</div>
                     </div>
                     <div class="sig-area">
                         <div class="sig-box">Assinatura Corretor</div>
                         <div class="sig-box">Assinatura Produtor</div>
                     </div>
+                    <div style="text-align:center; font-size:8px; margin-top:10px;">Sistema de Gestão Tuta Café</div>
                 </div>
             `;
         });
@@ -202,7 +208,7 @@
     }
 
     function remover(id) {
-        if(confirm("Deseja EXCLUIR este registro permanentemente?")) {
+        if(confirm("ATENÇÃO: Deseja EXCLUIR este registro permanentemente?")) {
             database.ref('compras/'+id).remove();
         }
     }
@@ -210,9 +216,9 @@
     function imprimir(id) {
         const todos = document.querySelectorAll('.receipt');
         todos.forEach(r => r.style.display = 'none');
-        const Alvo = document.getElementById('rec-print-' + id);
-        if(Alvo) {
-            Alvo.style.display = 'block';
+        const alvo = document.getElementById('rec-print-' + id);
+        if(alvo) {
+            alvo.style.display = 'block';
             window.print();
         }
     }
